@@ -32,6 +32,14 @@ test('?boot plays the boot screen even for a returning, reduced-motion visitor',
   await expect(page.getByRole('button', { name: 'Memes' })).toBeVisible();
 });
 
+// X's video server refuses requests that name another site as the referrer (D28).
+test('pages send no referrer to other sites, so X videos play', async ({ page }) => {
+  for (const url of ['/', '/today/']) {
+    await page.goto(url);
+    await expect(page.locator('meta[name="referrer"]')).toHaveAttribute('content', 'same-origin');
+  }
+});
+
 test('phone layout: apps fill the screen and back goes home', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'phone layout only');
   await page.goto('/?w=news');

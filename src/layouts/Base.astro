@@ -26,6 +26,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Tell other sites nothing about where visitors came from. X's video server
+         (video.twimg.com) refuses requests that name another site as the referrer, so
+         drop videos only play without one (D28). -->
+    <meta name="referrer" content="same-origin" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
