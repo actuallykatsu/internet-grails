@@ -1,9 +1,8 @@
 name: CI
 
 on:
+  # Every branch, so work on a feature branch is checked before it reaches main (D31).
   push:
-    branches: [main]
-  pull_request:
 
 jobs:
   check:

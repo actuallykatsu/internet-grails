@@ -45,6 +45,8 @@ Demo tip: the boot screen plays once per tab and never with reduced motion on. O
 
 Every push to `main` (and every finished "Sync drops" run, so new drops show up) builds the site and publishes it to GitHub Pages at https://preview.internetgrails.com (`.github/workflows/deploy.yml`, D30). The preview is built with `SITE_URL` set to that address, so its links and share images point at the preview, and every page says `noindex` so search engines leave it alone. internetgrails.com keeps its coming-soon page until launch (D22).
 
+Work happens on branches (D31): `main` is what's on the preview, so each feature gets its own branch and is merged into `main` when it's finished. CI checks every branch push; only `main` deploys. A push that only adds drops doesn't deploy by itself: the deploy runs once "Sync drops" has filled the drop in.
+
 To build the preview locally: `SITE_URL=https://preview.internetgrails.com npm run build`.
 
 One-time setup (already done once it's live):

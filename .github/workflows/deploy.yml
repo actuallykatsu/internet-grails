@@ -11,8 +11,11 @@ name: Deploy preview
 on:
   push:
     branches: [main]
+    # A push that only adds drops (the phone's Shortcut) deploys after "Sync drops" has
+    # filled it in instead (below), so it isn't built twice.
+    paths-ignore: ['src/content/drops/**']
   # The "Sync drops" bot commits with GitHub's own token, and those pushes don't start
-  # other workflows, so deploy again whenever it finishes to pick up filled-in drops.
+  # other workflows, so deploy whenever it finishes to pick up filled-in drops.
   workflow_run:
     workflows: [Sync drops]
     types: [completed]
