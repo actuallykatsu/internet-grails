@@ -10,7 +10,8 @@ function kindOf({ kind, post }: CollectionEntry<'drops'>['data']): DropKind {
 
 function toDrop(entry: CollectionEntry<'drops'>): Drop {
   const { data } = entry;
-  const date = data.post?.createdAt ?? data.addedAt;
+  // A drop the sync hasn't seen yet has neither; it's brand new, so the build time is close.
+  const date = data.post?.createdAt ?? data.addedAt ?? new Date();
   return {
     id: entry.id,
     url: data.url,

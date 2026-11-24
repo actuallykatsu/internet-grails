@@ -47,11 +47,10 @@ turn on **Show in Share Sheet**. Then add these actions in order:
 | 2   | **Match Text**            | Pattern `status/(\d+)` in **Shortcut Input**.                                                                                                                                                                                                              |
 | 3   | **Get Group from Matches** | Group at index **1** in **Matches**.                                                                                                                                                                                                                      |
 | 4   | **Set Variable**          | Name `PostID`, value **Text from Group**.                                                                                                                                                                                                                  |
-| 5   | **Format Date** | Tap the Date field and pick **Current Date** from the variables bar above the keyboard (a blue token, not typed text); no separate Date action is needed. Format **ISO 8601**, **Include Time** on. Add a **Show Result** after it once to check it shows one line with the time right now, like `2026-11-24T11:52:07-05:00`, then remove it. Exactly `12:00:00` means it read a date out of text instead of using Current Date. |
-| 6   | **Text** | `{"url":"https://x.com/i/status/PostID","addedAt":"Formatted Date"}` on one line (tap to insert the `PostID` and `Formatted Date` variables where the names are). Turn off **Settings → General → Keyboard → Smart Punctuation** before typing it, or the quotes come out curly. |
-| 7   | **Base64 Encode**         | Encode **Text**. Tap **Show More** and set **Line Breaks** to **None**.                                                                                                                                                                                    |
-| 8   | **Get Contents of URL**   | URL `https://api.github.com/repos/actuallykatsu/internet-grails/contents/src/content/drops/PostID.json`. Method **PUT**. Headers: `Authorization` = `Bearer <your token>`, `Accept` = `application/vnd.github+json`. Request Body **JSON**: `message` (Text) = `Add drop PostID`, `content` (Text) = **Base64 Encoded**. If it says "cannot parse response" or "Problems parsing JSON", add a **Text** action before this one holding `{"message":"Add drop PostID","content":"Base64 Encoded"}` (straight quotes, variables inserted), set Request Body to **File** with that Text, and add the header `Content-Type` = `application/json`. |
-| 9   | **Show Notification**     | `Dropped to Internet Grails`.                                                                                                                                                                                                                              |
+| 5   | **Text** | `{"url":"https://x.com/i/status/PostID"}` on one line (tap to insert the `PostID` variable where the name is). No date: the site records when the drop arrived. Turn off **Settings → General → Keyboard → Smart Punctuation** before typing it, or the quotes come out curly. |
+| 6   | **Base64 Encode**         | Encode **Text**. Tap **Show More** and set **Line Breaks** to **None**.                                                                                                                                                                                    |
+| 7   | **Get Contents of URL**   | URL `https://api.github.com/repos/actuallykatsu/internet-grails/contents/src/content/drops/PostID.json`. Method **PUT**. Headers: `Authorization` = `Bearer <your token>`, `Accept` = `application/vnd.github+json`. Request Body **JSON**: `message` (Text) = `Add drop PostID`, `content` (Text) = **Base64 Encoded**. If it says "cannot parse response" or "Problems parsing JSON", add a **Text** action before this one holding `{"message":"Add drop PostID","content":"Base64 Encoded"}` (straight quotes, variables inserted), set Request Body to **File** with that Text, and add the header `Content-Type` = `application/json`. |
+| 8   | **Show Notification**     | `Dropped to Internet Grails`.                                                                                                                                                                                                                              |
 
 ### 3. Try it
 
@@ -61,10 +60,9 @@ file in `src/content/drops/` has the post's caption and media.
 
 ## Good to know
 
-- **A drop failed in CI?** The site repairs the usual phone mistakes (curly quotes, a date
-  split over two lines) when "Sync drops" runs, and resets a bad date to the time of the
-  sync. If a file still can't be read, "Sync drops" fails and names it; fix it by hand on
-  github.com.
+- **A drop failed in CI?** CI and "Sync drops" repair the usual phone mistakes (curly
+  quotes, stray line breaks, an old Shortcut that still sends a date) before checking.
+  If a file still can't be read, both fail and name it; fix it by hand on github.com.
 - **Sharing the same post twice** does nothing: GitHub refuses to overwrite the file
   (the Shortcut shows an error from GitHub; that's fine).
 - **Removing a drop:** delete its file in `src/content/drops/` on github.com (or ask

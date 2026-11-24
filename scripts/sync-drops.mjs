@@ -12,6 +12,8 @@
  *   npm run drops:sync              fill in drops that have no `post`
  *   npm run drops:sync -- --force   refresh every drop (likes, avatars)
  *   npm run drops:sync -- 1234 5678 just these post ids
+ *   npm run drops:sync -- --repair  only repair files and fill in addedAt, no fetching
+ *                                   (CI runs this before building, D27)
  */
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -19,6 +21,7 @@ import path from 'node:path';
 const DIR = path.resolve(import.meta.dirname, '../src/content/drops');
 const args = process.argv.slice(2);
 const force = args.includes('--force');
+const repairOnly = args.includes('--repair');
 const only = new Set(args.filter((a) => /^\d+$/.test(a)));
 
 /** The token X's embed widget sends with each request. */
@@ -107,7 +110,10 @@ function readDrop(raw) {
   }
 }
 
-/** addedAt must be one date. If it isn't, use now: the sync runs right after a drop lands. */
+/**
+ * addedAt must be one date. If it's missing (the Shortcut no longer sends one, D27) or
+ * isn't a single date, use now: the sync runs right after a drop lands.
+ */
 function fixAddedAt(drop) {
   const value = drop.addedAt;
   if (typeof value === 'string' && /^\S+$/.test(value) && !isNaN(Date.parse(value))) return false;
@@ -129,15 +135,18 @@ for (const file of files) {
   try {
     const read = readDrop(await readFile(full, 'utf8'));
     drop = read.drop;
-    if (fixAddedAt(drop) || read.repaired) {
+    const dated = fixAddedAt(drop);
+    if (dated || read.repaired) {
       await save(full, drop);
-      console.warn(`fix  ${id}  repaired the file the Shortcut wrote`);
+      const what = read.repaired ? 'repaired the file the Shortcut wrote' : 'set addedAt';
+      console.log(`fix  ${id}  ${what}`);
     }
   } catch (err) {
     broken++;
     console.warn(`fail ${file}  not valid JSON, fix it by hand: ${err.message}`);
     continue;
   }
+  if (repairOnly) continue;
   if (drop.embedOnly || (drop.post && !force)) continue;
   if (!/^\d+$/.test(id)) {
     console.warn(`skip ${file}: name it after the post id`);

@@ -130,7 +130,8 @@ const drops = defineCollection({
     url: z.url(),
     /** Leave out to go by the media: anything with a video or GIF is a video. */
     kind: z.enum(['meme', 'video']).optional(),
-    addedAt: z.coerce.date(),
+    /** Filled in by the sync script when it first sees the drop (D27). */
+    addedAt: z.coerce.date().optional(),
     embedOnly: z.boolean().default(false),
     draft: z.boolean().default(false),
     post: z
