@@ -7,6 +7,7 @@ import { useWindowManager, type WinSpec } from './useWindowManager';
 import { SECTIONS, SITE } from '../../lib/site';
 import ContactForm from '../ContactForm';
 import type { PostSummary } from '../../lib/posts';
+import { tickerItems } from '../../lib/ticker';
 
 interface Props {
   posts: PostSummary[];
@@ -173,6 +174,7 @@ export default function Desktop({ posts, children }: Props) {
       ))}
 
       <Taskbar
+        ticker={tickerItems(posts)}
         startItems={START_ITEMS}
         windows={wm.wins.map((w) => ({ id: w.id, title: w.title, active: wm.activeId === w.id }))}
         onStartItem={(item) => item.windowId && wm.open(item.windowId)}

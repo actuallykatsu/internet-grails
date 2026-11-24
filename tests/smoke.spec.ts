@@ -215,3 +215,28 @@ test('contact form sends a message', async ({ page }) => {
   expect(sent).toMatchObject({ name: 'Test Person', message: 'Hello from the smoke test.' });
   expect(sent.website).toBeUndefined();
 });
+
+// D23: breaking posts scroll in the tray ticker, which can be paused, and stay still
+// (one headline at a time) for reduced motion.
+test('breaking ticker scrolls, pauses and links to the post', async ({ page, browser }) => {
+  await page.goto('/');
+  await hydrated(page);
+  const ticker = page.getByRole('region', { name: 'Breaking news' });
+  const track = ticker.locator('.ig-ticker__track');
+  await expect(track).toHaveCSS('animation-name', 'ig-ticker');
+  await ticker.getByRole('button', { name: 'Pause ticker' }).click();
+  await expect(track).toHaveCSS('animation-play-state', 'paused');
+  await ticker.getByRole('button', { name: 'Resume ticker' }).click();
+  await ticker.getByRole('link', { name: 'Welcome to Internet Grails' }).click();
+  await expect(page).toHaveURL(/\/posts\/welcome-to-the-grails\/$/);
+
+  const context = await browser.newContext({ reducedMotion: 'reduce' });
+  await context.addInitScript(() => sessionStorage.setItem('ig-booted', '1'));
+  const still = await context.newPage();
+  await still.goto('/');
+  await hydrated(still);
+  const stillTicker = still.getByRole('region', { name: 'Breaking news' });
+  await expect(stillTicker.locator('.ig-ticker__still')).toHaveText('Welcome to Internet Grails');
+  await expect(stillTicker.locator('.ig-ticker__track')).toHaveCount(0);
+  await context.close();
+});

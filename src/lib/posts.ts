@@ -26,6 +26,7 @@ export interface PostSummary {
   type: PostType;
   typeLabel: string;
   date: string;
+  breaking: boolean;
 }
 
 export function toSummary(post: Post): PostSummary {
@@ -36,6 +37,7 @@ export function toSummary(post: Post): PostSummary {
     type: post.data.type,
     typeLabel: POST_TYPE_LABELS[post.data.type],
     date: post.data.date.toISOString().slice(0, 10),
+    breaking: post.data.breaking,
   };
 }
 

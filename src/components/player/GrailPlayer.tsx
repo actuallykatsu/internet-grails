@@ -6,6 +6,7 @@ import {
   type PointerEvent as RPointerEvent,
 } from 'react';
 import { closePlayer, minimizePlayer, openPlayer, playerStore } from '../../lib/player';
+import { usePrefersReducedMotion } from '../../lib/motion';
 import type { Track } from '../../lib/tracks';
 
 /**
@@ -16,24 +17,11 @@ import type { Track } from '../../lib/tracks';
  */
 
 const BARS = 24;
-const REDUCE = '(prefers-reduced-motion: reduce)';
 
 function clock(s: number) {
   const m = Math.floor(s / 60);
   return `${m}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 }
-
-function subscribeReduce(on: () => void) {
-  const mq = window.matchMedia(REDUCE);
-  mq.addEventListener('change', on);
-  return () => mq.removeEventListener('change', on);
-}
-const usePrefersReducedMotion = () =>
-  useSyncExternalStore(
-    subscribeReduce,
-    () => window.matchMedia(REDUCE).matches,
-    () => false,
-  );
 
 /** A calm, fixed bar shape: what the visualizer shows when paused or reduced. */
 const RESTING = Array.from({ length: BARS }, (_, i) => 0.18 + 0.5 * Math.sin((i / BARS) * Math.PI));

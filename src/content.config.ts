@@ -34,6 +34,8 @@ const base = z.object({
   /** Where the story, clip or meme came from. */
   credits: z.array(credit).default([]),
   draft: z.boolean().default(false),
+  /** Shows in the taskbar's breaking-news ticker until unset (D23). */
+  breaking: z.boolean().default(false),
 });
 
 const news = base.extend({ type: z.literal('news') });

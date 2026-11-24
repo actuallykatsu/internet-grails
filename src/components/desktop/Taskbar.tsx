@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { openPlayer, playerStore, togglePlayerMinimized, toggleMuted } from '../../lib/player';
 import { SITE } from '../../lib/site';
 import PixelIcon from '../icons/PixelIcon';
+import Ticker from './Ticker';
+import type { TickerItem } from '../../lib/ticker';
 import type { IconName } from '../icons/pixelIcons';
 
 export interface StartItem {
@@ -23,6 +25,8 @@ interface Props {
   windows?: { id: string; title: string; active: boolean }[];
   onStartItem?: (item: StartItem) => void;
   onWindowButton?: (id: string) => void;
+  /** Breaking headlines for the tray ticker (D23). */
+  ticker?: TickerItem[];
 }
 
 function Clock({ className = 'ig-tray__clock' }: { className?: string }) {
@@ -43,7 +47,13 @@ function Clock({ className = 'ig-tray__clock' }: { className?: string }) {
   );
 }
 
-export default function Taskbar({ startItems, windows = [], onStartItem, onWindowButton }: Props) {
+export default function Taskbar({
+  startItems,
+  windows = [],
+  onStartItem,
+  onWindowButton,
+  ticker = [],
+}: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const player = useSyncExternalStore(
     playerStore.subscribe,
@@ -156,6 +166,8 @@ export default function Taskbar({ startItems, windows = [], onStartItem, onWindo
             </button>
           )}
         </nav>
+
+        <Ticker items={ticker} />
 
         <div className="ig-tray">
           <p className="ig-contact-strip ig-tray__contact">

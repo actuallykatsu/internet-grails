@@ -3,6 +3,7 @@ type: news
 title: Welcome to Internet Grails
 summary: A sample news post that shows the article template, an embed and source credits.
 date: 2026-11-24
+breaking: true
 author: staff
 tags: [meta]
 embeds:

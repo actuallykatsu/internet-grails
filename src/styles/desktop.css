@@ -285,6 +285,75 @@
   font-size: 18px;
 }
 
+/* Breaking-news ticker (D23): a little LED sign set into the taskbar. */
+.ig-ticker {
+  flex: 0 1 360px;
+  min-width: 140px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  margin: 0 6px;
+  padding: 0 4px;
+  background: var(--ig-ink);
+  color: var(--ig-accent-2);
+  box-shadow: var(--ig-bevel-in);
+  font-family: var(--ig-font-chrome);
+  font-size: 18px;
+}
+.ig-ticker__label {
+  padding: 0 4px;
+  background: #c8102e;
+  color: #fff;
+  font-size: 15px;
+  text-transform: uppercase;
+  line-height: 20px;
+}
+.ig-ticker__window {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.ig-ticker__track {
+  display: inline-flex;
+  animation: ig-ticker linear infinite;
+}
+.ig-ticker:hover .ig-ticker__track,
+.ig-ticker:focus-within .ig-ticker__track,
+.ig-ticker[data-paused] .ig-ticker__track {
+  animation-play-state: paused;
+}
+@keyframes ig-ticker {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.ig-ticker__run {
+  padding-right: 0.5em;
+}
+.ig-ticker a {
+  color: inherit;
+  text-decoration: none;
+}
+.ig-ticker a:hover,
+.ig-ticker a:focus-visible {
+  text-decoration: underline;
+}
+.ig-ticker__still {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ig-ticker__pause {
+  border: 0;
+  padding: 0 2px;
+  background: none;
+  color: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
 @media (max-width: 860px) {
   .ig-tray__contact {
     display: none;
@@ -339,6 +408,26 @@
     justify-content: center;
     padding: 0 8px;
     box-shadow: none;
+  }
+  /* The ticker moves up into the status bar, between the carrier name and the clock. */
+  .ig-ticker {
+    position: fixed;
+    top: 0;
+    left: 88px;
+    right: 124px;
+    z-index: 9001;
+    height: var(--ig-status-h);
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  .ig-ticker__label {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 0;
   }
   .ig-tray__contact {
     display: block;

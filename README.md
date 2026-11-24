@@ -22,7 +22,7 @@ Astro 7 + TypeScript, React islands for the desktop/window manager, Markdown con
 
 - `src/lib/site.ts`: business identity (name, email, X, TikTok) and desktop sections. Edit contact details here only.
 - `src/content.config.ts`: the content model. Six post types: `news`, `meme-gallery`, `music-pick`, `trend-roundup`, `interview`, `daily-roundup`.
-- `src/content/posts/*.md`: posts (samples for now). `src/content/authors/*.json`: authors.
+- `src/content/posts/*.md`: posts (samples for now). Add `breaking: true` to a post's front matter to put it in the taskbar ticker; remove it when the story is no longer breaking. `src/content/authors/*.json`: authors.
 - `src/components/desktop/`: window manager, desktop and taskbar. Open windows are mirrored to `?w=` so they can be linked.
 - `src/components/ContactForm.tsx`: the contact form, used on `/contact` and in the desktop Contact window. It posts to the forms service in `PUBLIC_CONTACT_ENDPOINT` (see `.env.example`), or opens the email app when that is unset.
 - `src/layouts/WindowPage.astro`: real-URL pages (articles, Contact, About) shown as a maximized window.
