@@ -27,6 +27,20 @@ export default defineConfig({
         access: 'public',
         optional: true,
       }),
+      // Supabase (D36): the project URL and its publishable key. Both are public; the
+      // database's row-level security is what protects the data. Without them, the
+      // "Grail it" buttons are hidden.
+      PUBLIC_SUPABASE_URL: envField.string({
+        context: 'client',
+        access: 'public',
+        optional: true,
+        url: true,
+      }),
+      PUBLIC_SUPABASE_KEY: envField.string({
+        context: 'client',
+        access: 'public',
+        optional: true,
+      }),
     },
   },
 });

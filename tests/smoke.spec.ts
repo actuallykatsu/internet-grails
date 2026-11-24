@@ -10,6 +10,8 @@ async function hydrated(page: Page) {
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => sessionStorage.setItem('ig-booted', '1'));
   await page.route('https://platform.twitter.com/**', (route) => route.abort());
+  // The fake Supabase project (D36): no grails anywhere unless a test says otherwise.
+  await page.route('https://grails.example.test/**', (route) => route.fulfill({ json: [] }));
 });
 
 test('desktop loads with icons and taskbar', async ({ page, isMobile }) => {
@@ -354,6 +356,97 @@ test('each drop has its own page with a share button', async ({ page, context, i
 });
 
 // D32: drops get their own feed, apart from the articles.
+// D36: "Grail it" against a fake Supabase project (see playwright.config.ts). The first
+// grail signs the visitor in anonymously; a reload remembers it; pressing again takes it back.
+test('Grail it likes a drop, remembers it and takes it back', async ({ page }) => {
+  const target = 'drop:sample-meme-1';
+  let total = 4;
+  const userId = '00000000-0000-4000-8000-000000000001';
+  const inserted: unknown[] = [];
+  const deleted: string[] = [];
+  let signups = 0;
+  const b64 = (o: object) => Buffer.from(JSON.stringify(o)).toString('base64url');
+  const now = Math.floor(Date.now() / 1000);
+  const jwt = `${b64({ alg: 'HS256', typ: 'JWT' })}.${b64({ sub: userId, role: 'authenticated', exp: now + 3600, is_anonymous: true })}.sig`;
+
+  await page.route('https://grails.example.test/**', async (route) => {
+    const req = route.request();
+    const url = new URL(req.url());
+    if (url.pathname === '/rest/v1/rpc/grail_counts') {
+      return route.fulfill({ json: [{ target, count: total }] });
+    }
+    if (url.pathname === '/auth/v1/signup') {
+      signups++;
+      return route.fulfill({
+        json: {
+          access_token: jwt,
+          token_type: 'bearer',
+          expires_in: 3600,
+          expires_at: now + 3600,
+          refresh_token: 'refresh-test',
+          user: { id: userId, aud: 'authenticated', role: 'authenticated', is_anonymous: true },
+        },
+      });
+    }
+    if (url.pathname === '/rest/v1/grails') {
+      if (req.method() === 'POST') {
+        inserted.push(req.postDataJSON());
+        total++;
+        return route.fulfill({ status: 201, body: '' });
+      }
+      if (req.method() === 'DELETE') {
+        deleted.push(url.search);
+        total--;
+        return route.fulfill({ status: 204, body: '' });
+      }
+      // The visitor's own grails.
+      return route.fulfill({ json: inserted.length > deleted.length ? [{ target }] : [] });
+    }
+    return route.fulfill({ json: [] });
+  });
+
+  await page.goto('/drops/sample-meme-1/');
+  await hydrated(page);
+  const button = page.getByRole('button', { name: /Grail/ });
+  await expect(button).toHaveAttribute('aria-pressed', 'false');
+  await expect(button).toContainText('Grail it');
+  await expect(button).toContainText('4');
+
+  await button.click();
+  await expect(button).toHaveAttribute('aria-pressed', 'true');
+  await expect(button).toContainText('Grailed');
+  await expect(button).toContainText('5');
+  await expect.poll(() => inserted).toEqual([{ target }]);
+  expect(signups).toBe(1);
+
+  // Next visit: the sign-in is remembered, and so is the grail.
+  await page.reload();
+  await hydrated(page);
+  await expect(button).toHaveAttribute('aria-pressed', 'true');
+  await expect(button).toContainText('5');
+
+  await button.click();
+  await expect(button).toHaveAttribute('aria-pressed', 'false');
+  await expect(button).toContainText('4');
+  await expect.poll(() => deleted.length).toBe(1);
+  expect(deleted[0]).toContain(`target=eq.${encodeURIComponent(target)}`);
+  expect(signups).toBe(1);
+});
+
+test('Grail it undoes itself when saving fails', async ({ page }) => {
+  await page.route('https://grails.example.test/**', (route) => {
+    const path = new URL(route.request().url()).pathname;
+    if (path === '/rest/v1/rpc/grail_counts') return route.fulfill({ json: [] });
+    return route.fulfill({ status: 500, json: { message: 'down' } });
+  });
+  await page.goto('/drops/sample-meme-1/');
+  await hydrated(page);
+  const button = page.getByRole('button', { name: /Grail/ });
+  await button.click();
+  await expect(page.getByRole('status').filter({ hasText: "Couldn't save" })).toBeVisible();
+  await expect(button).toHaveAttribute('aria-pressed', 'false');
+});
+
 test('drops feed lists drops, newest first, linking to their day', async ({ request }) => {
   const res = await request.get('/drops.xml');
   expect(res.ok()).toBe(true);

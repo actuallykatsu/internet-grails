@@ -28,12 +28,15 @@ jobs:
       - run: node scripts/sync-drops.mjs --repair
       # Build the real site first: this checks every real drop file (D25).
       - run: npm run build
-      # Then rebuild for the tests, with the fixed sample drops and a fake forms endpoint
-      # so the contact form test exercises the send path (D21).
+      # Then rebuild for the tests, with the fixed sample drops, a fake forms endpoint
+      # so the contact form test exercises the send path (D21), and a fake Supabase
+      # project the "Grail it" test intercepts (D36).
       - run: npm run build
         env:
           DROPS_DIR: tests/fixtures/drops
           PUBLIC_CONTACT_ENDPOINT: https://forms.example.test/contact
+          PUBLIC_SUPABASE_URL: https://grails.example.test
+          PUBLIC_SUPABASE_KEY: sb_publishable_test
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
       - uses: actions/upload-artifact@v4

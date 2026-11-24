@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import XEmbed from './XEmbed';
+import GrailButton from '../GrailButton';
 import {
   dropAnchor,
   dropHeadline,
@@ -142,6 +143,9 @@ export default function XPost({ drop, onOpenPhoto }: Props) {
     return (
       <article id={dropAnchor(drop.id)} className="ig-xpost ig-xpost--embed" aria-label="Post on X">
         <XEmbed url={drop.url} />
+        <div className="ig-xpost__foot ig-xpost__foot--embed">
+          <GrailButton target={`drop:${drop.id}`} />
+        </div>
       </article>
     );
   }
@@ -177,6 +181,7 @@ export default function XPost({ drop, onOpenPhoto }: Props) {
           />
         )}
         <footer className="ig-xpost__foot">
+          <GrailButton target={`drop:${drop.id}`} />
           {post.likes !== undefined && (
             <span className="ig-xpost__likes">
               <span aria-hidden="true">♥</span> {post.likes.toLocaleString('en-US')}

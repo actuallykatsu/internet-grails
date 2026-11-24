@@ -18,6 +18,25 @@ export const PALETTE: Record<string, string> = {
 };
 
 export const ICONS = {
+  // The "Grail it" chalice (D36).
+  grail: [
+    '................',
+    '..kkkkkkkkkkkk..',
+    '..kywyyyyyyyyk..',
+    '..kywyyyyyyyyk..',
+    '..kywyyyyyyyyk..',
+    '...kwyyyyyyyk...',
+    '...kyyyyyyyyk...',
+    '....kyyyyyyk....',
+    '.....kkyykk.....',
+    '......kyyk......',
+    '......kyyk......',
+    '......kyyk......',
+    '.....kyyyyk.....',
+    '....kyyyyyyk....',
+    '....kkkkkkkk....',
+    '................',
+  ],
   memes: [
     '................',
     '.kkkkkkkkkkkkkk.',

@@ -19,8 +19,8 @@ const mail = `mailto:${SITE.email}`;
 >
   <h1>Privacy policy</h1>
   <p>
-    The short version: {SITE.name} has no accounts, no ads and no analytics, and sets no cookies of
-    its own. The only personal information we receive is what you choose to send us.
+    The short version: {SITE.name} has no ads and no analytics, and sets no cookies. We know only
+    what you choose to give us: a message, or the posts you grail.
   </p>
 
   <h2>Who we are</h2>
@@ -42,6 +42,13 @@ const mail = `mailto:${SITE.email}`;
       each request (such as IP address, browser type and the page asked for) to run and protect the
       service. We don't use these to identify you.
     </li>
+    <li>
+      <strong>Your grails.</strong> The first time you press <em>Grail it</em>, the site signs you
+      in anonymously: you get a random ID with no name or email attached. We store which posts that
+      ID grailed and when, so we can show totals and remember yours. Our database provider,
+      Supabase, also logs the IP address of each sign-in to protect the service. Grails are stored
+      on Supabase's servers in the United States.
+    </li>
   </ul>
   <p>
     We don't sell personal information, and we don't share it except with the services that run the
@@ -49,10 +56,17 @@ const mail = `mailto:${SITE.email}`;
   </p>
 
   <h2>What stays on your device</h2>
-  <p>
-    The site remembers, for the current browser tab only, that you've already seen the boot screen.
-    That note never leaves your device and disappears when you close the tab.
-  </p>
+  <ul>
+    <li>
+      For the current browser tab only, the site remembers that you've already seen the boot screen.
+      That note never leaves your device and disappears when you close the tab.
+    </li>
+    <li>
+      Once you've grailed something, your browser keeps your anonymous sign-in in its local storage
+      so your grails are still yours next time. Clearing this site's data in your browser forgets
+      it.
+    </li>
+  </ul>
 
   <h2>Content from other sites</h2>
   <p>
@@ -72,15 +86,16 @@ const mail = `mailto:${SITE.email}`;
   <h2>Your choices</h2>
   <p>
     You can ask us what we hold about you, ask us to correct it, or ask us to delete it, by emailing{' '}
-    <a href={mail}>{SITE.email}</a>. Depending on where you live, you may have further rights under
-    local law; we'll honor them.
+    <a href={mail}>{SITE.email}</a>. You can take back a grail any time by pressing the button
+    again. Depending on where you live, you may have further rights under local law; we'll honor
+    them.
   </p>
 
   <h2>Coming soon, and changes</h2>
   <p>
-    We plan to add likes, comments, accounts and a newsletter. Before any of those go live, we'll
-    update this policy to say what they store and why. When this policy changes, the date below
-    changes too.
+    We plan to add comments, accounts and a newsletter. Before any of those go live, we'll update
+    this policy to say what they store and why. When this policy changes, the date below changes
+    too.
   </p>
 
   <PolicyLinks />

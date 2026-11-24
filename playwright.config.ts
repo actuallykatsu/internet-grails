@@ -24,7 +24,13 @@ export default defineConfig({
       : `npm run build && npm run preview -- --port ${PORT}`,
     timeout: 240_000,
     url: `http://localhost:${PORT}`,
-    env: { DROPS_DIR },
+    // A fake Supabase project (D36): the "Grail it" test intercepts its requests, so tests
+    // never touch the real one in .env. CI builds with the same values (ci.yml).
+    env: {
+      DROPS_DIR,
+      PUBLIC_SUPABASE_URL: 'https://grails.example.test',
+      PUBLIC_SUPABASE_KEY: 'sb_publishable_test',
+    },
     reuseExistingServer: !process.env.CI,
   },
 });

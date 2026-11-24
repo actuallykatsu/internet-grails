@@ -60,6 +60,9 @@ jobs:
           SITE_URL: https://preview.internetgrails.com
           PUBLIC_CONTACT_ENDPOINT: ${{ vars.PUBLIC_CONTACT_ENDPOINT }}
           PUBLIC_CONTACT_ACCESS_KEY: ${{ vars.PUBLIC_CONTACT_ACCESS_KEY }}
+          # Supabase for "Grail it" (D36): public values, kept as repository variables.
+          PUBLIC_SUPABASE_URL: ${{ vars.PUBLIC_SUPABASE_URL }}
+          PUBLIC_SUPABASE_KEY: ${{ vars.PUBLIC_SUPABASE_KEY }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

@@ -393,6 +393,40 @@ a {
   gap: 10px;
   font-size: 0.9rem;
 }
+.ig-xpost__foot {
+  flex-wrap: wrap;
+}
+.ig-xpost__foot--embed {
+  padding: 6px 0 0;
+}
+/* "Grail it" (D36) */
+.ig-grail {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.ig-grail__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-inline: 10px;
+}
+.ig-grail__btn[aria-pressed='true'] {
+  background: #fff3c4;
+}
+.ig-grail__btn[aria-busy='true'] {
+  cursor: progress;
+}
+.ig-grail__count {
+  min-width: 1ch;
+  padding-left: 6px;
+  border-left: 1px solid var(--ig-mid, #a6a29a);
+}
+.ig-grail__error:not(:empty) {
+  color: var(--ig-accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
 .ig-xpost__likes {
   color: var(--ig-accent);
   font-weight: 600;
