@@ -1,0 +1,86 @@
+---
+import WindowPage from '../../layouts/WindowPage.astro';
+import DropFeed from '../../components/drops/DropFeed';
+import { getDrops } from '../../lib/drops';
+import {
+  dayHref,
+  dropDayHref,
+  dropHeadline,
+  dropKindLabel,
+  formatDay,
+  type Drop,
+} from '../../lib/drop';
+import { SITE } from '../../lib/site';
+
+/**
+ * A page per drop (D34), e.g. /drops/2125280721816174650/: the link to share. Its share
+ * image shows the drop's own picture (see src/lib/shareCards.ts).
+ */
+export async function getStaticPaths() {
+  const drops = await getDrops();
+  return drops.map((drop) => ({ params: { id: drop.id }, props: { drop } }));
+}
+
+const { drop } = Astro.props as { drop: Drop };
+const kind = dropKindLabel(drop);
+const headline = dropHeadline(drop);
+const by = drop.post ? ` by ${drop.post.author.handle}` : '';
+const description = drop.post?.text
+  ? dropHeadline(drop, 200)
+  : `A ${kind.toLowerCase()}${by} on ${SITE.name}, dropped ${formatDay(drop.day)}.`;
+---
+
+<WindowPage
+  title={headline}
+  windowTitle={`${kind} - ${drop.day}`}
+  description={description}
+  backHref={dropDayHref(drop)}
+>
+  <header class="ig-drop__head">
+    <p class="ig-drop__kicker">
+      {kind} · <a href={dayHref(drop.day)}>{formatDay(drop.day)}</a>
+    </p>
+    <h1>{headline}</h1>
+  </header>
+
+  <DropFeed client:load drops={[drop]} />
+
+  <nav class="ig-drop__nav" aria-label="More drops">
+    <a class="ig-btn" href={dropDayHref(drop)}>
+      ◀ More from {formatDay(drop.day)}
+    </a>
+    <a class="ig-btn" href="/today/">
+      Today&rsquo;s Grails ▶
+    </a>
+  </nav>
+</WindowPage>
+
+<style>
+  .ig-drop__kicker {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ig-accent);
+    margin: 0;
+  }
+  .ig-drop__kicker a {
+    color: inherit;
+  }
+  .ig-drop__head h1 {
+    margin: 0.2rem 0 1.2rem;
+    font-size: clamp(1.3rem, 3vw, 1.8rem);
+  }
+  .ig-drop__nav {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 1.5rem;
+    max-width: 560px;
+  }
+  .ig-drop__nav a {
+    text-decoration: none;
+    color: inherit;
+  }
+</style>

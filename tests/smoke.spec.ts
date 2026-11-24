@@ -48,6 +48,8 @@ test('pages have their own share image', async ({ page, request }) => {
     '/today/': '/og/today.png',
     '/posts/welcome-to-the-grails/': '/og/posts/welcome-to-the-grails.png',
     '/mockups/mobile/': '/og/index.png',
+    '/drops/sample-meme-1/': '/og/drops/sample-meme-1.png',
+    '/drops/sample-video-1/': '/og/drops/sample-video-1.png',
   };
   for (const [url, image] of Object.entries(pages)) {
     await page.goto(url);
@@ -298,6 +300,31 @@ test('RSS feed lists published posts', async ({ request }) => {
   expect(xml).toContain('/posts/welcome-to-the-grails/');
 });
 
+// D34: every drop has its own page to share; its card links there and copies the link.
+test('each drop has its own page with a share button', async ({ page, context, isMobile }) => {
+  await page.goto('/today/2026-11-24/');
+  await hydrated(page);
+  await page
+    .locator('#drop-sample-meme-1')
+    .getByRole('link', { name: /^Meme ·/ })
+    .click();
+  await expect(page).toHaveURL(/\/drops\/sample-meme-1\/$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Sample meme drop: one image.');
+  await expect(page).toHaveTitle('Sample meme drop: one image. · Internet Grails');
+  await expect(
+    page.getByRole('link', { name: /More from Tuesday, November 24, 2026/ }),
+  ).toHaveAttribute('href', '/today/2026-11-24/#drop-sample-meme-1');
+  // Phones open the share sheet instead of copying.
+  test.skip(isMobile, 'copying the link is the desktop behavior');
+  await hydrated(page);
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.getByRole('button', { name: 'Share' }).click();
+  await expect(page.getByRole('button', { name: 'Link copied' })).toBeVisible();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(
+    /\/drops\/sample-meme-1\/$/,
+  );
+});
+
 // D32: drops get their own feed, apart from the articles.
 test('drops feed lists drops, newest first, linking to their day', async ({ request }) => {
   const res = await request.get('/drops.xml');
@@ -307,13 +334,13 @@ test('drops feed lists drops, newest first, linking to their day', async ({ requ
   const titles = [...xml.matchAll(/<item><title>([^<]*)<\/title>/g)].map((m) => m[1]);
   expect(titles[0]).toMatch(/^Sample video drop/);
   expect(titles[1]).toBe('Sample meme drop: one image.');
-  expect(xml).toContain('/today/2026-11-24/#drop-sample-meme-1</link>');
+  expect(xml).toContain('/drops/sample-meme-1/</link>');
   expect(xml).not.toContain('/posts/welcome-to-the-grails/');
   const rssXml = await (await request.get('/rss.xml')).text();
   expect(rssXml).not.toContain('#drop-');
 });
 
-// D32: after breaking posts, the ticker shows the newest day's drops, each linking to its card.
+// D32: after breaking posts, the ticker shows the newest day's drops, each linking to its page.
 test('ticker shows the latest drops after breaking posts', async ({ page }) => {
   await page.goto('/about/');
   await hydrated(page);
@@ -322,10 +349,7 @@ test('ticker shows the latest drops after breaking posts', async ({ page }) => {
   await expect(links.first()).toHaveText('Welcome to Internet Grails');
   await expect(links).toHaveCount(3);
   const meme = ticker.getByRole('link', { name: 'New drop: Sample meme drop: one image.' }).first();
-  await expect(meme).toHaveAttribute('href', '/today/2026-11-24/#drop-sample-meme-1');
-  // It may be scrolled out of the ticker's view, so follow its link rather than click it.
-  await page.goto('/today/2026-11-24/#drop-sample-meme-1');
-  await expect(page.locator('#drop-sample-meme-1')).toBeInViewport();
+  await expect(meme).toHaveAttribute('href', '/drops/sample-meme-1/');
 });
 
 // D24: Pagefind builds the index after `astro build`, so this needs the built site

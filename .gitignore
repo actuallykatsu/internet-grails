@@ -9,3 +9,5 @@ playwright-report/
 .DS_Store
 Internet Grails Phased Build Plan.md
 Claude.md
+.cache/
+

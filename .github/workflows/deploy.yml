@@ -46,6 +46,13 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # Drop pictures for the share images (D34), downloaded from X once and kept between
+      # runs. A new cache is saved each run; the newest one is restored.
+      - uses: actions/cache@v4
+        with:
+          path: .cache/share-pictures
+          key: share-pictures-${{ github.run_id }}
+          restore-keys: share-pictures-
       # Repair any drop the phone just added, as CI and "Sync drops" do (D27).
       - run: node scripts/sync-drops.mjs --repair
       - run: npm run build

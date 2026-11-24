@@ -2,7 +2,7 @@ import { getEntry } from 'astro:content';
 import { SITE } from './site';
 import { formatDate, getPublishedPosts, postWindowTitle, POST_TYPE_LABELS } from './posts';
 import { getDropDays } from './drops';
-import { formatDay } from './drop';
+import { dropHeadline, dropKindLabel, dropPicture, formatDay } from './drop';
 
 /**
  * Share images (D29): the picture X, iMessage, Discord and others show when someone
@@ -18,6 +18,11 @@ export interface ShareCard {
   description: string;
   /** A small line under the description, such as the date and author. */
   meta?: string;
+  /**
+   * A picture to show beside the text (D34): a drop's photo or video poster, as a URL or
+   * a path in public/. A video gets a play button drawn over it.
+   */
+  picture?: { src: string; video: boolean };
 }
 
 export const SHARE_IMAGE_SIZE = { width: 1200, height: 630 } as const;
@@ -74,6 +79,18 @@ async function buildShareCards(): Promise<ShareCard[]> {
   ];
 
   for (const { day, drops } of await getDropDays()) {
+    for (const drop of drops) {
+      const picture = dropPicture(drop);
+      cards.push({
+        key: `drops/${drop.id}`,
+        windowTitle: `${dropKindLabel(drop)} - ${day}`,
+        kicker: dropKindLabel(drop),
+        title: dropHeadline(drop, 90),
+        description: formatDay(day),
+        meta: drop.post?.author.handle,
+        picture: picture && { src: picture.src, video: drop.kind === 'video' },
+      });
+    }
     cards.push({
       key: `today/${day}`,
       windowTitle: `Today's Grails - ${day}`,

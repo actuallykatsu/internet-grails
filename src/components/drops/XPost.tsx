@@ -1,6 +1,13 @@
 import { useState, type ReactNode } from 'react';
 import XEmbed from './XEmbed';
-import { dropAnchor, formatDropTime, type Drop, type DropMedia } from '../../lib/drop';
+import {
+  dropAnchor,
+  dropHeadline,
+  dropHref,
+  formatDropTime,
+  type Drop,
+  type DropMedia,
+} from '../../lib/drop';
 import { usePrefersReducedMotion } from '../../lib/motion';
 
 /**
@@ -94,6 +101,39 @@ function Media({
   );
 }
 
+/**
+ * Shares the drop's own page (D34): the phone's share sheet on touch screens, otherwise
+ * the link is copied.
+ */
+function ShareButton({ drop }: { drop: Drop }) {
+  const [copied, setCopied] = useState(false);
+  const share = async () => {
+    const url = new URL(dropHref(drop), location.origin).href;
+    if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+      // Cancelling the share sheet rejects; nothing to do.
+      await navigator.share({ title: dropHeadline(drop), url }).catch(() => {});
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      location.href = url;
+    }
+  };
+  return (
+    <>
+      <button type="button" className="ig-btn" onClick={share}>
+        {copied ? 'Link copied' : 'Share'}
+      </button>
+      <span className="sr-only" role="status">
+        {copied ? 'Link copied' : ''}
+      </span>
+    </>
+  );
+}
+
 export default function XPost({ drop, onOpenPhoto }: Props) {
   const [broken, setBroken] = useState(false);
   const { post } = drop;
@@ -115,9 +155,9 @@ export default function XPost({ drop, onOpenPhoto }: Props) {
       aria-label={`Post by ${label}`}
     >
       <div className="ig-titlebar">
-        <span className="ig-titlebar__title">
+        <a className="ig-titlebar__title ig-xpost__permalink" href={dropHref(drop)}>
           {drop.kind === 'video' ? 'Video' : 'Meme'} · {formatDropTime(post.createdAt)}
-        </span>
+        </a>
       </div>
       <div className="ig-xpost__body">
         <header className="ig-xpost__author">
@@ -143,9 +183,12 @@ export default function XPost({ drop, onOpenPhoto }: Props) {
               <span className="sr-only"> likes</span>
             </span>
           )}
-          <a className="ig-btn" href={drop.url} rel="noopener" target="_blank">
-            View on X ↗
-          </a>
+          <span className="ig-xpost__actions">
+            <ShareButton drop={drop} />
+            <a className="ig-btn" href={drop.url} rel="noopener" target="_blank">
+              View on X ↗
+            </a>
+          </span>
         </footer>
       </div>
     </article>

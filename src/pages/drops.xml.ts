@@ -7,7 +7,7 @@ import { SITE } from '../lib/site';
 /**
  * The drops feed (D32): every meme and video from X, newest first, kept apart from
  * /rss.xml so a dozen drops a day don't bury the articles. Each item shows the post's
- * text and pictures (video posters) and links to the drop on its day page.
+ * text and pictures (video posters) and links to the drop's own page (D34).
  */
 
 const LIMIT = 60;
@@ -38,8 +38,6 @@ export async function GET(context: APIContext) {
     title: `${SITE.name}: drops`,
     description: `Every meme and video from ${SITE.name}, as it drops.`,
     site,
-    // The links already end in a slash or a #drop- anchor; don't add one after the anchor.
-    trailingSlash: false,
     items: drops.map((drop) => ({
       title: dropHeadline(drop),
       description: dropHeadline(drop, 280),

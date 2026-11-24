@@ -67,9 +67,26 @@ export function dropAnchor(id: string): string {
   return `drop-${id}`;
 }
 
-/** A link straight to one drop: its day page, scrolled to its card. */
-export function dropHref(drop: Pick<Drop, 'id' | 'day'>): string {
+/** A drop's own page (D34), the link to share. */
+export function dropHref(drop: Pick<Drop, 'id'>): string {
+  return `/drops/${drop.id}/`;
+}
+
+/** A drop on its day page, scrolled to its card. */
+export function dropDayHref(drop: Pick<Drop, 'id' | 'day'>): string {
   return `${dayHref(drop.day)}#${dropAnchor(drop.id)}`;
+}
+
+/** "Meme" or "Video". */
+export function dropKindLabel(drop: Pick<Drop, 'kind'>): string {
+  return drop.kind === 'video' ? 'Video' : 'Meme';
+}
+
+/** The first picture to show for a drop: its first photo, or a video's poster. */
+export function dropPicture(drop: Drop): { src: string; alt: string } | undefined {
+  const m = drop.post?.media[0];
+  if (!m) return undefined;
+  return m.type === 'photo' ? { src: m.url, alt: m.alt ?? '' } : { src: m.poster, alt: '' };
 }
 
 /**
@@ -82,7 +99,7 @@ export function dropHeadline(drop: Drop, max = 80): string {
     .split('\n')
     .map((l) => l.replace(/\s+/g, ' ').trim())
     .find(Boolean);
-  const kind = drop.kind === 'video' ? 'Video' : 'Meme';
+  const kind = dropKindLabel(drop);
   if (!line)
     return drop.post ? `${kind} from ${drop.post.author.handle}` : `New ${kind.toLowerCase()}`;
   return line.length > max ? `${line.slice(0, max - 1).trimEnd()}…` : line;
