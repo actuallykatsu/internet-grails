@@ -13,6 +13,18 @@ export const SITE = {
   founded: '2026',
 } as const;
 
+/**
+ * The policy pages (D35). Bump `updated` whenever one of them changes in substance.
+ */
+export const POLICIES = {
+  updated: 'November 24, 2026',
+  pages: [
+    { href: '/privacy/', label: 'Privacy policy' },
+    { href: '/terms/', label: 'Terms of use' },
+    { href: '/guidelines/', label: 'Community guidelines' },
+  ],
+} as const;
+
 /** Desktop sections: which post types each lists, and which kind of drop (D25) it shows. */
 export const SECTIONS = [
   { id: 'memes', label: 'Memes', icon: 'memes', types: ['meme-gallery'], drops: 'meme' },

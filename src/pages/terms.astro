@@ -1,0 +1,87 @@
+---
+import WindowPage from '../layouts/WindowPage.astro';
+import PolicyLinks from '../components/PolicyLinks.astro';
+import { SITE } from '../lib/site';
+
+/* Terms of use (D35), including how to ask for a post to be credited or taken down. */
+const mail = `mailto:${SITE.email}`;
+---
+
+<WindowPage
+  title="Terms of use"
+  windowTitle="Terms - Internet Grails"
+  description={`The rules for using ${SITE.name}, and how to ask for credit or a takedown.`}
+  backHref="/about/"
+>
+  <h1>Terms of use</h1>
+  <p>
+    By using {SITE.name} you agree to these terms. They're written to be read; if something is
+    unclear, ask us at <a href={mail}>{SITE.email}</a>.
+  </p>
+
+  <h2>What's here</h2>
+  <p>
+    {SITE.name} shares memes, videos, music and news from around the internet, mostly posts from our
+    X account <a href={SITE.x.url}>{SITE.x.handle}</a>, along with our own writing. It's for
+    entertainment and information, and it's free to read.
+  </p>
+
+  <h2>Who owns what</h2>
+  <ul>
+    <li>
+      <strong>Other people's work.</strong> Memes, clips and posts belong to the people who made
+      them. We show them with a link back to where they were posted, and we don't claim them as
+      ours.
+    </li>
+    <li>
+      <strong>Our work.</strong> The {SITE.name} name and logo, the site's design and our own
+      articles belong to us. You're welcome to share links to anything here.
+    </li>
+  </ul>
+
+  <h2 id="takedown">Credit and takedown requests</h2>
+  <p>
+    If something here is yours and you'd like it credited differently or taken down, email{' '}
+    <a href={mail}>{SITE.email}</a> with:
+  </p>
+  <ul>
+    <li>a link to the page on {SITE.name},</li>
+    <li>a link to your original, or other details showing it's yours,</li>
+    <li>whether you want credit added or the post removed, and how to reach you.</li>
+  </ul>
+  <p>
+    We review requests quickly and act in good faith. Formal copyright notices under the US Digital
+    Millennium Copyright Act (DMCA) can be sent to the same address.
+  </p>
+
+  <h2>Using the site</h2>
+  <p>
+    Please don't try to break, overload or scrape the site in ways that harm it or other visitors,
+    and don't use it for anything illegal. When comments and accounts arrive, our{' '}
+    <a href="/guidelines/">community guidelines</a> will apply to what you post, and you'll keep
+    ownership of it while letting us show it on the site. We may remove posts or accounts that break
+    the rules.
+  </p>
+
+  <h2>Links and other services</h2>
+  <p>
+    The site links to and shows content from other services, such as X, YouTube and Spotify. We
+    don't control them, and their own terms apply when you use them.
+  </p>
+
+  <h2>No guarantees</h2>
+  <p>
+    The site is provided as it is. We try to keep it accurate and working, but we can't promise it
+    always will be, and posts reflect the internet as we found it, not our endorsement. To the
+    extent the law allows, we aren't liable for losses that come from using the site or relying on
+    what's on it.
+  </p>
+
+  <h2>Changes</h2>
+  <p>
+    We may update these terms as the site grows. When they change, the date below changes too, and
+    using the site after that means you accept the new version.
+  </p>
+
+  <PolicyLinks />
+</WindowPage>

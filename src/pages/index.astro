@@ -5,7 +5,7 @@ import Logo from '../components/Logo.astro';
 import Desktop from '../components/desktop/Desktop';
 import { getPublishedPosts, toSummary } from '../lib/posts';
 import { getDrops } from '../lib/drops';
-import { SITE } from '../lib/site';
+import { POLICIES, SITE } from '../lib/site';
 
 const posts = (await getPublishedPosts()).map(toSummary);
 // Only the latest few of each kind ride along in the page; the rest live on /today/.
@@ -33,6 +33,11 @@ const drops = [
       <li>
         <a href="/contact/">Contact</a>
       </li>
+      {POLICIES.pages.map(({ href, label }) => (
+        <li>
+          <a href={href}>{label}</a>
+        </li>
+      ))}
       <li>
         <a href="/today/">Today's Grails</a>
       </li>

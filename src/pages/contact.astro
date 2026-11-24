@@ -35,6 +35,9 @@ import ContactForm from '../components/ContactForm';
 
   <h2>Send a message</h2>
   <ContactForm client:visible />
+  <p class="ig-contact__privacy">
+    We use your message only to reply. See the <a href="/privacy/">privacy policy</a>.
+  </p>
 </WindowPage>
 
 <style>
@@ -45,6 +48,9 @@ import ContactForm from '../components/ContactForm';
     padding: 14px 16px;
     background: #fff;
     box-shadow: var(--ig-bevel-in);
+  }
+  .ig-contact__privacy {
+    font-size: 0.9rem;
   }
   .ig-official dt {
     font-weight: 700;

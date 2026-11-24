@@ -1,0 +1,70 @@
+---
+import WindowPage from '../layouts/WindowPage.astro';
+import PolicyLinks from '../components/PolicyLinks.astro';
+import { SITE } from '../lib/site';
+
+/* Community guidelines (D35): the house rules for comments, likes and profiles (Phase 3). */
+const mail = `mailto:${SITE.email}`;
+---
+
+<WindowPage
+  title="Community guidelines"
+  windowTitle="Guidelines - Internet Grails"
+  description={`The house rules for comments, likes and profiles on ${SITE.name}.`}
+  backHref="/about/"
+>
+  <h1>Community guidelines</h1>
+  <p>
+    Comments, likes and profiles are coming to {SITE.name}. These are the house rules for them. The
+    aim is a comment section that feels like the best group chat you were ever in: funny, a bit
+    chaotic, never cruel.
+  </p>
+
+  <h2>Do</h2>
+  <ul>
+    <li>Be funny, be weird, argue about the meme. Roast the post, not the person.</li>
+    <li>Credit people. If you know who made something, say so.</li>
+    <li>Report anything that breaks these rules instead of replying to it.</li>
+  </ul>
+
+  <h2>Don't</h2>
+  <ul>
+    <li>
+      <strong>Harass or threaten anyone</strong>, or pile on someone, including the people in the
+      memes.
+    </li>
+    <li>
+      <strong>Post hate</strong> aimed at people for their race, ethnicity, religion, gender,
+      sexuality, disability or similar.
+    </li>
+    <li>
+      <strong>Share anyone's private information</strong>: addresses, phone numbers, private photos,
+      screenshots of private messages.
+    </li>
+    <li>
+      <strong>Post sexual content involving minors</strong>, ever. We report it to the authorities.
+    </li>
+    <li>
+      <strong>Post graphic violence, porn, or anything illegal.</strong>
+    </li>
+    <li>
+      <strong>Spam</strong>: ads, scams, link drops, or posting the same thing over and over.
+    </li>
+    <li>
+      <strong>Pretend to be someone you're not</strong>, including {SITE.name} or the people who run
+      it.
+    </li>
+    <li>
+      <strong>Post other people's work as your own.</strong>
+    </li>
+  </ul>
+
+  <h2>What happens if you break them</h2>
+  <p>
+    A person reviews what gets reported. Depending on how bad it is, we may remove the post, hold
+    your future comments for review, or ban you. New commenters' first comments may wait for a quick
+    review before they appear. If you think we got it wrong, email <a href={mail}>{SITE.email}</a>.
+  </p>
+
+  <PolicyLinks />
+</WindowPage>

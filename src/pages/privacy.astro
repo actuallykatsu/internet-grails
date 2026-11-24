@@ -1,0 +1,87 @@
+---
+import WindowPage from '../layouts/WindowPage.astro';
+import PolicyLinks from '../components/PolicyLinks.astro';
+import { SITE } from '../lib/site';
+
+/*
+ * Privacy policy (D35). It describes what the site does today. Update it before any
+ * feature that stores visitors' data goes live (likes, comments, accounts, newsletter,
+ * analytics), and bump POLICIES.updated in src/lib/site.ts.
+ */
+const mail = `mailto:${SITE.email}`;
+---
+
+<WindowPage
+  title="Privacy policy"
+  windowTitle="Privacy - Internet Grails"
+  description={`What ${SITE.name} collects about visitors (very little) and how to reach us about it.`}
+  backHref="/about/"
+>
+  <h1>Privacy policy</h1>
+  <p>
+    The short version: {SITE.name} has no accounts, no ads and no analytics, and sets no cookies of
+    its own. The only personal information we receive is what you choose to send us.
+  </p>
+
+  <h2>Who we are</h2>
+  <p>
+    {SITE.name} ({SITE.url.replace('https://', '')}) is a website about internet culture. Questions
+    about this policy go to <a href={mail}>{SITE.email}</a>.
+  </p>
+
+  <h2>What we collect</h2>
+  <ul>
+    <li>
+      <strong>Messages you send us.</strong> If you use the contact form, we receive your name,
+      email address and message. The form is delivered by a form service that passes it to our
+      inbox; if it isn't available, the form opens your own email app instead. We use your message
+      only to reply and keep it only as long as the conversation needs.
+    </li>
+    <li>
+      <strong>Server logs.</strong> Like every website, our host records basic technical details of
+      each request (such as IP address, browser type and the page asked for) to run and protect the
+      service. We don't use these to identify you.
+    </li>
+  </ul>
+  <p>
+    We don't sell personal information, and we don't share it except with the services that run the
+    site, or when the law requires it.
+  </p>
+
+  <h2>What stays on your device</h2>
+  <p>
+    The site remembers, for the current browser tab only, that you've already seen the boot screen.
+    That note never leaves your device and disappears when you close the tab.
+  </p>
+
+  <h2>Content from other sites</h2>
+  <p>
+    Many memes and videos on {SITE.name} are posts from X. Their pictures and videos load straight
+    from X's servers, so X receives your IP address when you view them; we don't tell X which page
+    you were on. When a post can't be shown that way, or when an article includes a player from X,
+    YouTube, Spotify, SoundCloud or TikTok, that company's own code loads on the page and may set
+    cookies under its own privacy policy. Links to other sites are covered by those sites' policies.
+  </p>
+
+  <h2>Children</h2>
+  <p>
+    {SITE.name} isn't meant for children under 13, and we don't knowingly collect their information.
+    If you think a child has sent us personal information, email us and we'll delete it.
+  </p>
+
+  <h2>Your choices</h2>
+  <p>
+    You can ask us what we hold about you, ask us to correct it, or ask us to delete it, by emailing{' '}
+    <a href={mail}>{SITE.email}</a>. Depending on where you live, you may have further rights under
+    local law; we'll honor them.
+  </p>
+
+  <h2>Coming soon, and changes</h2>
+  <p>
+    We plan to add likes, comments, accounts and a newsletter. Before any of those go live, we'll
+    update this policy to say what they store and why. When this policy changes, the date below
+    changes too.
+  </p>
+
+  <PolicyLinks />
+</WindowPage>

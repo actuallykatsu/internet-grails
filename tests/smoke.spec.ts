@@ -213,6 +213,34 @@ test('contact page shows official details without the desktop', async ({ page })
   await expect(page.getByRole('main')).toContainText('@internetgrails');
 });
 
+test('policy pages are linked from About and link to each other', async ({ page }) => {
+  await page.goto('/about/');
+  const policies = [
+    ['Privacy policy', '/privacy/'],
+    ['Terms of use', '/terms/'],
+    ['Community guidelines', '/guidelines/'],
+  ] as const;
+  for (const [label, href] of policies) {
+    await expect(page.getByRole('main').getByRole('link', { name: label })).toHaveAttribute(
+      'href',
+      href,
+    );
+  }
+  for (const [label, href] of policies) {
+    await page.goto(href);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(label);
+    const nav = page.getByRole('navigation', { name: 'Policies' });
+    await expect(nav).toContainText('Last updated');
+    await expect(nav.locator('[aria-current="page"]')).toHaveText(label);
+    await expect(nav.getByRole('link')).toHaveCount(policies.length - 1);
+  }
+  await page.goto('/contact/');
+  await expect(page.getByRole('link', { name: 'privacy policy' })).toHaveAttribute(
+    'href',
+    '/privacy/',
+  );
+});
+
 test('every page carries Organization structured data', async ({ page }) => {
   await page.goto('/about/');
   const json = await page.locator('script[type="application/ld+json"]').first().textContent();

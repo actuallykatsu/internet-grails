@@ -1,0 +1,40 @@
+---
+/** The "last updated" line and links between the policy pages (D35). */
+import { POLICIES } from '../lib/site';
+
+const here = Astro.url.pathname;
+---
+
+<nav class="ig-policies" aria-label="Policies">
+  <p>Last updated {POLICIES.updated}.</p>
+  <ul>
+    {POLICIES.pages.map(({ href, label }) => (
+      <li>
+        {href === here ? <span aria-current="page">{label}</span> : <a href={href}>{label}</a>}
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .ig-policies {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--ig-mid, #a6a29a);
+    font-size: 0.9rem;
+  }
+  .ig-policies p {
+    margin: 0 0 0.5rem;
+  }
+  .ig-policies ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ig-policies [aria-current] {
+    font-weight: 700;
+  }
+</style>

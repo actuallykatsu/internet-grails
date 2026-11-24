@@ -1,6 +1,6 @@
 ---
 import WindowPage from '../layouts/WindowPage.astro';
-import { SITE } from '../lib/site';
+import { POLICIES, SITE } from '../lib/site';
 ---
 
 <WindowPage title="About" windowTitle="About - Internet Grails" description={SITE.tagline}>
@@ -29,5 +29,17 @@ import { SITE } from '../lib/site';
   <p>
     Business &amp; press: <a href={`mailto:${SITE.email}`}>{SITE.email}</a> · Official X:{' '}
     <a href={SITE.x.url}>{SITE.x.handle}</a> · <a href="/contact/">Contact page</a>
+  </p>
+
+  <h2>Policies</h2>
+  <ul>
+    {POLICIES.pages.map(({ href, label }) => (
+      <li>
+        <a href={href}>{label}</a>
+      </li>
+    ))}
+  </ul>
+  <p>
+    Is something here yours? See <a href="/terms/#takedown">credit and takedown requests</a>.
   </p>
 </WindowPage>

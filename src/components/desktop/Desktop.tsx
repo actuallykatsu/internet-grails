@@ -4,7 +4,7 @@ import PixelIcon from '../icons/PixelIcon';
 import Taskbar, { PLAYER_START_ITEM, type StartItem } from './Taskbar';
 import { openPlayer } from '../../lib/player';
 import { useWindowManager, type WinSpec } from './useWindowManager';
-import { SECTIONS, SITE } from '../../lib/site';
+import { POLICIES, SECTIONS, SITE } from '../../lib/site';
 import ContactForm from '../ContactForm';
 import Search from '../Search';
 import type { PostSummary } from '../../lib/posts';
@@ -125,6 +125,14 @@ function AboutBody() {
       </p>
       <p>
         <a href="/about/">Read the full About page →</a>
+      </p>
+      <p>
+        {POLICIES.pages.map(({ href, label }, i) => (
+          <span key={href}>
+            {i > 0 && ' · '}
+            <a href={href}>{label}</a>
+          </span>
+        ))}
       </p>
     </div>
   );
