@@ -41,6 +41,21 @@ Demo tip: the boot screen plays once per tab and never with reduced motion on. O
 - `src/components/icons/pixelIcons.ts`: the pixel icons, one text grid per icon (D16).
 - `src/components/Logo.astro`: the logo (`full` wordmark or compact `mark`). Its paths come from `nostalgia_logo_v1.png`; after changing the artwork, run `node scripts/trace-logo.mjs` (and update `SPARKLE_HINTS` / `FOREGROUND_HINTS` there if sparkles or the pieces in front of the globe move). The spinning globe lives in `src/components/logo/globe.ts`; set `LOGO_VARIANT = 'classic'` in `src/lib/site.ts` to go back to the flat logo.
 
+## Preview deploy
+
+Every push to `main` (and every finished "Sync drops" run, so new drops show up) builds the site and publishes it to GitHub Pages at https://preview.internetgrails.com (`.github/workflows/deploy.yml`, D30). The preview is built with `SITE_URL` set to that address, so its links and share images point at the preview, and every page says `noindex` so search engines leave it alone. internetgrails.com keeps its coming-soon page until launch (D22).
+
+To build the preview locally: `SITE_URL=https://preview.internetgrails.com npm run build`.
+
+One-time setup (already done once it's live):
+
+1. GitHub repo → Settings → Pages → Build and deployment → Source: **GitHub Actions**.
+2. Same page → Custom domain: `preview.internetgrails.com` → Save.
+3. At Network Solutions, add a DNS record: type **CNAME**, host `preview`, value `actuallykatsu.github.io`. Leave the other records alone, so the coming-soon page stays.
+4. Once GitHub has issued the certificate (minutes to an hour), tick **Enforce HTTPS**.
+5. Optional: in GitHub's account settings → Pages, verify `internetgrails.com` so no other GitHub account can claim its subdomains.
+6. For the contact form, set `PUBLIC_CONTACT_ENDPOINT` and `PUBLIC_CONTACT_ACCESS_KEY` under Settings → Secrets and variables → Actions → **Variables**.
+
 ## Placeholders to replace
 
 - TikTok handle in `src/lib/site.ts`.

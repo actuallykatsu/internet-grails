@@ -4,7 +4,10 @@ import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://internetgrails.com',
+  // The address the site is built for. The preview deploy sets SITE_URL to
+  // https://preview.internetgrails.com (D30); any address other than the real one marks
+  // every page noindex (see Base.astro).
+  site: process.env.SITE_URL || 'https://internetgrails.com',
   integrations: [react(), sitemap()],
   prefetch: true,
   // The dev toolbar floats over the bottom of the page, where the taskbar and the

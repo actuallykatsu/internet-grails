@@ -20,6 +20,9 @@ interface Props {
 const { title, description = SITE.tagline, index = true } = Astro.props;
 const fullTitle = title ? `${title} · ${SITE.name}` : `${SITE.name}: ${SITE.tagline}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+// A build for any other address (the preview, D30) keeps out of search results, so it
+// never competes with the real site.
+const preview = Astro.site?.origin !== new URL(SITE.url).origin;
 // Every page's share image is drawn as a retro window (D29).
 const shareImage = new URL(await shareImageFor(Astro.url.pathname), Astro.site);
 const shareAlt = `${title ?? SITE.name}, shown as a window on the ${SITE.name} desktop`;
@@ -47,7 +50,7 @@ const shareAlt = `${title ?? SITE.name}, shown as a window on the ${SITE.name} d
     <meta name="twitter:image:alt" content={shareAlt} />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="alternate" type="application/rss+xml" title={SITE.name} href="/rss.xml" />
-    {!index && <meta name="robots" content="noindex" />}
+    {(!index || preview) && <meta name="robots" content="noindex" />}
     <meta property="og:site_name" content={SITE.name} />
     <meta property="og:title" content={title ?? SITE.name} />
     <meta property="og:description" content={description} />

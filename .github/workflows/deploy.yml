@@ -1,0 +1,65 @@
+name: Deploy preview
+
+# D30: builds the site and publishes it to GitHub Pages at the preview address
+# (preview.internetgrails.com), kept out of search results. internetgrails.com itself
+# keeps its coming-soon page until development is done (D22).
+#
+# Needs, once: Settings -> Pages -> Source "GitHub Actions", the custom domain set to
+# preview.internetgrails.com, and a CNAME record for "preview" pointing at
+# actuallykatsu.github.io. See "Preview deploy" in the README.
+
+on:
+  push:
+    branches: [main]
+  # The "Sync drops" bot commits with GitHub's own token, and those pushes don't start
+  # other workflows, so deploy again whenever it finishes to pick up filled-in drops.
+  workflow_run:
+    workflows: [Sync drops]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; a newer push replaces one still waiting.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    # After "Sync drops", only deploy if it worked.
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # After "Sync drops", build what's on main now, including its commit.
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Repair any drop the phone just added, as CI and "Sync drops" do (D27).
+      - run: node scripts/sync-drops.mjs --repair
+      - run: npm run build
+        env:
+          SITE_URL: https://preview.internetgrails.com
+          PUBLIC_CONTACT_ENDPOINT: ${{ vars.PUBLIC_CONTACT_ENDPOINT }}
+          PUBLIC_CONTACT_ACCESS_KEY: ${{ vars.PUBLIC_CONTACT_ACCESS_KEY }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
