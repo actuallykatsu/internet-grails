@@ -5,16 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro check && astro build",
+    "build": "astro check && astro build && pagefind --site dist",
     "preview": "astro preview",
     "check": "astro check",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "drops:sync": "node scripts/sync-drops.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^7.0.1",
+    "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.6",
     "@fontsource-variable/inter": "^5.3.0",
     "@fontsource/vt323": "^5.3.0",
@@ -37,6 +39,7 @@
     "eslint-plugin-astro": "^1.7.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.14.0",
+    "pagefind": "^1.6.0",
     "potrace": "^2.1.8",
     "prettier": "^3.10.1",
     "prettier-plugin-astro": "^1.1.2",

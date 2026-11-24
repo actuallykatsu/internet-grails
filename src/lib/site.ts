@@ -13,12 +13,20 @@ export const SITE = {
   founded: '2026',
 } as const;
 
+/** Desktop sections: which post types each lists, and which kind of drop (D25) it shows. */
 export const SECTIONS = [
-  { id: 'memes', label: 'Memes', icon: 'memes', types: ['meme-gallery'] },
-  { id: 'music', label: 'Music', icon: 'music', types: ['music-pick'] },
-  { id: 'trends', label: 'Trends', icon: 'trends', types: ['trend-roundup'] },
-  { id: 'news', label: 'News', icon: 'news', types: ['news', 'daily-roundup', 'interview'] },
-  { id: 'vault', label: 'The Vault', icon: 'vault', types: 'all' },
+  { id: 'memes', label: 'Memes', icon: 'memes', types: ['meme-gallery'], drops: 'meme' },
+  { id: 'videos', label: 'Videos', icon: 'videos', types: [], drops: 'video' },
+  { id: 'music', label: 'Music', icon: 'music', types: ['music-pick'], drops: null },
+  { id: 'trends', label: 'Trends', icon: 'trends', types: ['trend-roundup'], drops: null },
+  {
+    id: 'news',
+    label: 'News',
+    icon: 'news',
+    types: ['news', 'daily-roundup', 'interview'],
+    drops: null,
+  },
+  { id: 'vault', label: 'The Vault', icon: 'vault', types: 'all', drops: null },
 ] as const;
 
 export type SectionId = (typeof SECTIONS)[number]['id'];

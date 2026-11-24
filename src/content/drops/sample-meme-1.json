@@ -1,0 +1,23 @@
+{
+  "url": "https://x.com/internetgrails",
+  "addedAt": "2026-11-24T15:31:00Z",
+  "post": {
+    "text": "Sample meme drop: one image.",
+    "createdAt": "2026-11-24T15:30:00Z",
+    "author": {
+      "name": "Internet Grails",
+      "handle": "@internetgrails",
+      "avatar": "/samples/avatar.svg"
+    },
+    "likes": 87,
+    "media": [
+      {
+        "type": "photo",
+        "url": "/samples/meme-1.svg",
+        "w": 400,
+        "h": 400,
+        "alt": "Placeholder meme 1"
+      }
+    ]
+  }
+}

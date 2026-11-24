@@ -478,6 +478,10 @@
   .ig-titlebar__btn {
     display: none;
   }
+  /* The image viewer is a pop-up, not an app: it keeps its close button. */
+  .ig-viewer .ig-titlebar__btn {
+    display: grid;
+  }
   .ig-titlebar__back {
     display: grid;
     place-items: center;
@@ -500,4 +504,35 @@
   body:has(.ig-player-mini) .ig-window__body {
     padding-bottom: 64px;
   }
+}
+
+/* ---------- Search window (D24) ---------- */
+.ig-search {
+  display: grid;
+  gap: 10px;
+}
+.ig-search__bar {
+  display: grid;
+  gap: 4px;
+}
+.ig-search__bar label {
+  font-weight: 600;
+}
+.ig-search__bar input {
+  font: inherit;
+  padding: 6px 8px;
+  border: 0;
+  background: #fff;
+  box-shadow: var(--ig-bevel-in);
+}
+.ig-search__results p {
+  margin: 0;
+}
+.ig-search__count {
+  font-size: 0.85rem;
+  color: var(--ig-ink-soft);
+}
+.ig-search mark {
+  background: #fff3a6;
+  color: inherit;
 }

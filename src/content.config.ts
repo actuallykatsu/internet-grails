@@ -100,4 +100,48 @@ const posts = defineCollection({
   ]),
 });
 
-export const collections = { authors, posts };
+/**
+ * Drops (D25): one file per X post, src/content/drops/<post id>.json. The iPhone
+ * Shortcut writes `url` and `addedAt`; scripts/sync-drops.mjs then copies the
+ * post's text and media into `post` so the site can draw it in its own style. A drop
+ * without `post` (or with `embedOnly`) shows X's official embed instead.
+ */
+const dropMedia = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('photo'),
+    url: z.string(),
+    w: z.number().int().positive(),
+    h: z.number().int().positive(),
+    alt: z.string().optional(),
+  }),
+  z.object({
+    type: z.enum(['video', 'gif']),
+    src: z.string(),
+    poster: z.string(),
+    w: z.number().int().positive(),
+    h: z.number().int().positive(),
+  }),
+]);
+
+const drops = defineCollection({
+  loader: glob({ pattern: '*.json', base: './src/content/drops' }),
+  schema: z.object({
+    url: z.url(),
+    /** Leave out to go by the media: anything with a video or GIF is a video. */
+    kind: z.enum(['meme', 'video']).optional(),
+    addedAt: z.coerce.date(),
+    embedOnly: z.boolean().default(false),
+    draft: z.boolean().default(false),
+    post: z
+      .object({
+        text: z.string(),
+        createdAt: z.coerce.date(),
+        author: z.object({ name: z.string(), handle: z.string(), avatar: z.string() }),
+        likes: z.number().int().nonnegative().optional(),
+        media: z.array(dropMedia).default([]),
+      })
+      .optional(),
+  }),
+});
+
+export const collections = { authors, posts, drops };

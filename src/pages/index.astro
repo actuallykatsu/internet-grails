@@ -4,15 +4,23 @@ import BootScreen from '../components/BootScreen.astro';
 import Logo from '../components/Logo.astro';
 import Desktop from '../components/desktop/Desktop';
 import { getPublishedPosts, toSummary } from '../lib/posts';
+import { getDrops } from '../lib/drops';
 import { SITE } from '../lib/site';
 
 const posts = (await getPublishedPosts()).map(toSummary);
+// Only the latest few of each kind ride along in the page; the rest live on /today/.
+const LATEST = 8;
+const allDrops = await getDrops();
+const drops = [
+  ...allDrops.filter((d) => d.kind === 'meme').slice(0, LATEST),
+  ...allDrops.filter((d) => d.kind === 'video').slice(0, LATEST),
+];
 ---
 
 <Base>
   <h1 class="sr-only">{SITE.name}</h1>
   <BootScreen />
-  <Desktop client:load posts={posts}>
+  <Desktop client:load posts={posts} drops={drops}>
     <Logo size="full" />
   </Desktop>
 
@@ -24,6 +32,9 @@ const posts = (await getPublishedPosts()).map(toSummary);
       </li>
       <li>
         <a href="/contact/">Contact</a>
+      </li>
+      <li>
+        <a href="/today/">Today's Grails</a>
       </li>
       {posts.map((p) => (
         <li>

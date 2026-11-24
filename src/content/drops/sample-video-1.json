@@ -1,0 +1,23 @@
+{
+  "url": "https://x.com/internetgrails",
+  "addedAt": "2026-11-24T18:05:00Z",
+  "post": {
+    "text": "Sample video drop. The real ones come straight from the X account, caption and all.",
+    "createdAt": "2026-11-24T18:04:00Z",
+    "author": {
+      "name": "Internet Grails",
+      "handle": "@internetgrails",
+      "avatar": "/samples/avatar.svg"
+    },
+    "likes": 1204,
+    "media": [
+      {
+        "type": "video",
+        "src": "/samples/drop-video.mp4",
+        "poster": "/samples/drop-video-poster.jpg",
+        "w": 480,
+        "h": 480
+      }
+    ]
+  }
+}

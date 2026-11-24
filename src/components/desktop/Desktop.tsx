@@ -6,17 +6,23 @@ import { openPlayer } from '../../lib/player';
 import { useWindowManager, type WinSpec } from './useWindowManager';
 import { SECTIONS, SITE } from '../../lib/site';
 import ContactForm from '../ContactForm';
+import Search from '../Search';
 import type { PostSummary } from '../../lib/posts';
 import { tickerItems } from '../../lib/ticker';
+import DropFeed from '../drops/DropFeed';
+import type { Drop } from '../../lib/drop';
 
 interface Props {
   posts: PostSummary[];
+  /** The latest drops for the Memes and Videos windows (D25). */
+  drops?: Drop[];
   /** Static wordmark passed in from Astro. */
   children?: ReactNode;
 }
 
 const EXTRA_ICONS = [
   { id: 'contact', label: 'Contact', icon: 'contact' },
+  { id: 'search', label: 'Search', icon: 'search' },
   { id: 'about', label: 'About', icon: 'about' },
   { id: 'player', label: 'Grail Player', icon: 'player' },
 ] as const;
@@ -33,6 +39,7 @@ const START_ITEMS: StartItem[] = [
     windowId: id,
   })),
   PLAYER_START_ITEM,
+  { label: "Today's Grails", icon: 'news', href: '/today/' },
   { label: 'Trend roundup mockup', icon: 'mockup', href: '/mockups/trend-roundup' },
   { label: 'Mobile mockup', icon: 'mockup', href: '/mockups/mobile' },
 ];
@@ -44,8 +51,28 @@ function postsFor(sectionId: string, posts: PostSummary[]) {
   return posts.filter((p) => (section.types as readonly string[]).includes(p.type));
 }
 
-function SectionWindowBody({ posts }: { posts: PostSummary[] }) {
+function SectionWindowBody({ posts, drops }: { posts: PostSummary[]; drops?: Drop[] }) {
+  if (drops) {
+    return (
+      <div className="ig-section-drops">
+        <DropFeed drops={drops} />
+        <p>
+          <a href="/today/">See everything in Today&rsquo;s Grails →</a>
+        </p>
+        {posts.length > 0 && (
+          <>
+            <h3>Posts</h3>
+            <PostList posts={posts} />
+          </>
+        )}
+      </div>
+    );
+  }
   if (!posts.length) return <p>Nothing here yet. Check back tomorrow.</p>;
+  return <PostList posts={posts} />;
+}
+
+function PostList({ posts }: { posts: PostSummary[] }) {
   return (
     <ul className="ig-filelist">
       {posts.map((p) => (
@@ -103,7 +130,12 @@ function AboutBody() {
   );
 }
 
-export default function Desktop({ posts, children }: Props) {
+function dropsFor(sectionId: string, drops: Drop[]) {
+  const kind = SECTIONS.find((s) => s.id === sectionId)?.drops;
+  return kind ? drops.filter((d) => d.kind === kind) : undefined;
+}
+
+export default function Desktop({ posts, drops = [], children }: Props) {
   const [selected, setSelected] = useState<string | null>(null);
 
   const resolve = useCallback((id: string): WinSpec | undefined => {
@@ -111,6 +143,10 @@ export default function Desktop({ posts, children }: Props) {
     if (!icon) return undefined;
     if (id === 'contact') return { id, title: 'Contact', w: 460, h: 640 };
     if (id === 'about') return { id, title: 'About', w: 420, h: 260 };
+    if (id === 'search') return { id, title: 'Find: All Posts', w: 520, h: 480 };
+    if (SECTIONS.find((s) => s.id === id)?.drops) {
+      return { id, title: `C:\\Grails\\${icon.label}`, w: 620, h: 600 };
+    }
     return { id, title: `C:\\Grails\\${icon.label}`, w: 560, h: 440 };
   }, []);
 
@@ -120,7 +156,8 @@ export default function Desktop({ posts, children }: Props) {
   const renderBody = (id: string) => {
     if (id === 'contact') return <ContactBody />;
     if (id === 'about') return <AboutBody />;
-    return <SectionWindowBody posts={postsFor(id, posts)} />;
+    if (id === 'search') return <Search />;
+    return <SectionWindowBody posts={postsFor(id, posts)} drops={dropsFor(id, drops)} />;
   };
 
   return (

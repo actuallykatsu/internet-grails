@@ -1,0 +1,28 @@
+{
+  "url": "https://x.com/internetgrails",
+  "addedAt": "2026-11-23T21:12:00Z",
+  "post": {
+    "text": "Sample meme drop with two images and a link: https://internetgrails.com",
+    "createdAt": "2026-11-23T21:10:00Z",
+    "author": {
+      "name": "Internet Grails",
+      "handle": "@internetgrails",
+      "avatar": "/samples/avatar.svg"
+    },
+    "likes": 342,
+    "media": [
+      {
+        "type": "photo",
+        "url": "/samples/meme-2.svg",
+        "w": 400,
+        "h": 400
+      },
+      {
+        "type": "photo",
+        "url": "/samples/meme-3.svg",
+        "w": 400,
+        "h": 400
+      }
+    ]
+  }
+}

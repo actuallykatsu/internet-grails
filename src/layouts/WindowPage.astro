@@ -17,14 +17,25 @@ interface Props {
   index?: boolean;
   /** Where the phone layout's back arrow goes (D20). */
   backHref?: string;
+  /** Include this page's content in site search (D24). Articles only. */
+  searchable?: boolean;
 }
 
-const { title, windowTitle = title, description, index, backHref = '/' } = Astro.props;
+const {
+  title,
+  windowTitle = title,
+  description,
+  index,
+  backHref = '/',
+  searchable = false,
+} = Astro.props;
 
 const startItems: StartItem[] = [
   { label: 'Desktop', icon: 'desktop', href: '/' },
   ...SECTIONS.map(({ id, label, icon }) => ({ label, icon, href: `/?w=${id}` })),
+  { label: "Today's Grails", icon: 'news', href: '/today/' },
   { label: 'Contact', icon: 'contact', href: '/contact/' },
+  { label: 'Search', icon: 'search', href: '/?w=search' },
   { label: 'About', icon: 'about', href: '/about/' },
   PLAYER_START_ITEM,
 ];
@@ -47,7 +58,7 @@ const ticker = tickerItems((await getPublishedPosts()).map(toSummary));
         </a>
       </div>
       <div class="ig-window__body">
-        <main class="ig-prose">
+        <main class="ig-prose" data-pagefind-body={searchable ? '' : undefined}>
           <slot />
         </main>
       </div>

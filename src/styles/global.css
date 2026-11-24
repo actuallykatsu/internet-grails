@@ -299,3 +299,111 @@ a {
 .ig-form__done p {
   margin: 0;
 }
+
+/* ---------- Drops: X posts drawn in the site's style (D25) ---------- */
+.ig-dropfeed {
+  display: grid;
+  gap: 16px;
+  max-width: 560px;
+}
+.ig-xpost {
+  margin: 0;
+}
+.ig-xpost__body {
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+  margin-top: 3px;
+  background: #fff;
+  box-shadow: var(--ig-bevel-in);
+}
+.ig-xpost__author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ig-xpost__author img {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--ig-ink);
+  image-rendering: pixelated;
+  background: var(--ig-chrome);
+}
+.ig-xpost__author > span {
+  display: grid;
+  line-height: 1.2;
+}
+.ig-xpost__handle {
+  font-size: 0.85rem;
+  color: var(--ig-ink-soft);
+}
+.ig-xpost__text {
+  margin: 0;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.ig-xpost__media {
+  display: grid;
+  gap: 4px;
+  background: #222;
+  padding: 3px;
+  box-shadow: var(--ig-bevel-in);
+}
+.ig-xpost__media[data-count='2'],
+.ig-xpost__media[data-count='4'] {
+  grid-template-columns: 1fr 1fr;
+}
+.ig-xpost__media[data-count='3'] {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.ig-xpost__photo {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+.ig-xpost__photo:focus-visible {
+  outline: 2px dotted var(--ig-accent-2);
+  outline-offset: -3px;
+}
+.ig-xpost__photo img,
+.ig-xpost__video {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+  object-fit: contain;
+  background: #000;
+}
+.ig-xpost__media:not([data-count='1']) .ig-xpost__photo img {
+  aspect-ratio: 1 !important;
+  object-fit: cover;
+}
+.ig-xpost__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.9rem;
+}
+.ig-xpost__likes {
+  color: var(--ig-accent);
+  font-weight: 600;
+}
+.ig-xpost__foot .ig-btn {
+  text-decoration: none;
+  color: inherit;
+}
+.ig-xpost--embed {
+  min-height: 120px;
+}
+.ig-xembed .twitter-tweet {
+  margin: 0 !important;
+}
+.ig-xembed blockquote {
+  margin: 0;
+  padding: 12px;
+  background: #fff;
+  box-shadow: var(--ig-bevel-in);
+}

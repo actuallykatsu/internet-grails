@@ -6,8 +6,10 @@ async function hydrated(page: Page) {
 }
 
 // Skip the boot screen in every test, like a returning visitor.
+// Keep tests off X's servers: the official embed then stays a plain link (D25).
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => sessionStorage.setItem('ig-booted', '1'));
+  await page.route('https://platform.twitter.com/**', (route) => route.abort());
 });
 
 test('desktop loads with icons and taskbar', async ({ page, isMobile }) => {
@@ -118,7 +120,12 @@ test('mobile wireframes render three screens', async ({ page }) => {
 // D18: one font per region. Inside window content panes everything reads in the body
 // font; only chrome (title bars, buttons) uses the pixel font.
 test('window contents use a single font', async ({ page }) => {
-  for (const url of ['/?w=news,contact,about,memes', '/posts/sample-trend-roundup/']) {
+  for (const url of [
+    '/?w=news,contact,about,memes,search',
+    '/?w=videos',
+    '/posts/sample-trend-roundup/',
+    '/today/',
+  ]) {
     await page.goto(url);
     const offenders = await page.evaluate(() => {
       const bad: string[] = [];
@@ -239,4 +246,93 @@ test('breaking ticker scrolls, pauses and links to the post', async ({ page, bro
   await expect(stillTicker.locator('.ig-ticker__still')).toHaveText('Welcome to Internet Grails');
   await expect(stillTicker.locator('.ig-ticker__track')).toHaveCount(0);
   await context.close();
+});
+
+test('RSS feed lists published posts', async ({ request }) => {
+  const res = await request.get('/rss.xml');
+  expect(res.ok()).toBe(true);
+  const xml = await res.text();
+  expect(xml).toContain('<title>Internet Grails</title>');
+  expect(xml).toContain('/posts/welcome-to-the-grails/');
+});
+
+// D24: Pagefind builds the index after `astro build`, so this needs the built site
+// (CI runs tests against `astro preview`). Under `astro dev` the window says so instead.
+test('search finds posts by their text', async ({ page }) => {
+  await page.goto('/?w=search');
+  await hydrated(page);
+  const win = page.getByRole('dialog', { name: 'Find: All Posts' });
+  await win.getByRole('searchbox').fill('interview');
+  await expect(win.locator('.ig-search__results')).not.toBeEmpty();
+  if (await win.getByText('Search runs on the built site').isVisible()) {
+    test.skip(true, 'no search index under astro dev');
+  }
+  const hit = win.getByRole('link', { name: /Now Showing/ });
+  await expect(hit).toBeVisible();
+  await expect(hit.locator('mark').first()).toHaveText(/interview/i);
+  await win.getByRole('searchbox').fill('zzzqqqnothing');
+  await expect(win).toContainText('No posts match');
+});
+
+// D25: X posts are drawn in the site's own style, photos open in the image viewer, and a
+// drop we have no copy of shows X's official embed.
+test('memes window draws drops and falls back to the X embed', async ({ page }) => {
+  await page.goto('/?w=memes');
+  await hydrated(page);
+  const win = page.getByRole('dialog', { name: /Memes/ });
+  const card = win.getByRole('article', { name: /Post by Internet Grails/ }).first();
+  await expect(card).toContainText('Sample meme drop: one image.');
+  await expect(card.getByRole('link', { name: /View on X/ })).toHaveAttribute('href', /x.com/);
+  await card.getByRole('button', { name: /Open image 1/ }).click();
+  const viewer = page.getByRole('dialog', { name: 'Image viewer' });
+  await expect(viewer).toContainText('Credit: @internetgrails');
+  // Esc closes the viewer but not the window it opened from.
+  await page.keyboard.press('Escape');
+  await expect(viewer).toBeHidden();
+  await expect(win).toBeVisible();
+
+  const embed = win.getByRole('article', { name: 'Post on X' });
+  await expect(embed.locator('blockquote.twitter-tweet a')).toHaveAttribute(
+    'href',
+    'https://x.com/jack/status/20',
+  );
+  // Videos stay out of Memes.
+  await expect(win.locator('video')).toHaveCount(0);
+});
+
+test('a drop whose media fails shows the X embed instead', async ({ page }) => {
+  await page.route('**/samples/meme-1.svg', (route) => route.fulfill({ status: 404 }));
+  await page.goto('/?w=memes');
+  await hydrated(page);
+  const win = page.getByRole('dialog', { name: /Memes/ });
+  await expect(win.getByText('Sample meme drop: one image.')).toHaveCount(0);
+  await expect(win.getByRole('article', { name: 'Post on X' })).toHaveCount(2);
+});
+
+test('videos window plays video drops on the site', async ({ page }) => {
+  await page.goto('/?w=videos');
+  await hydrated(page);
+  const win = page.getByRole('dialog', { name: /Videos/ });
+  const video = win.getByLabel(/Video from Internet Grails/);
+  await expect(video).toHaveAttribute('poster', /drop-video-poster/);
+  await video.evaluate((v: HTMLVideoElement) => {
+    v.muted = true;
+    return v.play();
+  });
+  await expect
+    .poll(() => video.evaluate((v: HTMLVideoElement) => v.currentTime))
+    .toBeGreaterThan(0);
+});
+
+test("Today's Grails shows the latest day and links to earlier ones", async ({ page }) => {
+  await page.goto('/today/');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Tuesday, November 24, 2026');
+  await expect(page.getByRole('main')).toContainText('1 video · 1 meme');
+  await page.getByRole('link', { name: /Older: Monday, November 23/ }).click();
+  await expect(page).toHaveURL(/\/today\/2026-11-23\/$/);
+  await expect(page.getByRole('main')).toContainText('Sample meme drop with two images');
+  await expect(page.getByRole('link', { name: /Newer: Tuesday/ })).toHaveAttribute(
+    'href',
+    '/today/2026-11-24/',
+  );
 });

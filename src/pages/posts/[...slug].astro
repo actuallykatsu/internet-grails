@@ -38,6 +38,7 @@ const backHref = section ? `/?w=${section.id}` : '/';
   windowTitle={windowTitle}
   description={data.summary}
   backHref={backHref}
+  searchable
 >
   <header class="ig-article__head">
     <p class="ig-article__kicker">{POST_TYPE_LABELS[data.type]}</p>

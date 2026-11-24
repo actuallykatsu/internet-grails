@@ -1,0 +1,45 @@
+---
+import WindowPage from '../../layouts/WindowPage.astro';
+import DropDay from '../../components/drops/DropDay.astro';
+import { getDropDays } from '../../lib/drops';
+import { dayHref, formatDay } from '../../lib/drop';
+
+/**
+ * The latest day of drops (D25), with the archive of earlier days below. Each day also
+ * has its own page, which is the one to link to.
+ */
+const days = await getDropDays();
+const latest = days[0];
+---
+
+<WindowPage
+  title="Today's Grails"
+  windowTitle="Today's Grails"
+  description="Every meme and video Internet Grails posts, day by day."
+>
+  {latest ? (
+    <>
+      <DropDay day={latest.day} drops={latest.drops} older={days[1]?.day} />
+    </>
+  ) : (
+    <p>Nothing yet. The first drops land soon.</p>
+  )}
+
+  {days.length > 1 && (
+    <section class="ig-day-archive">
+      <h2>Earlier days</h2>
+      <ul class="ig-filelist">
+        {days.slice(1).map(({ day, drops }) => (
+          <li>
+            <a href={dayHref(day)}>
+              <span class="ig-filelist__title">{formatDay(day)}</span>
+              <span class="ig-filelist__meta">
+                {drops.length} {drops.length === 1 ? 'drop' : 'drops'}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+</WindowPage>

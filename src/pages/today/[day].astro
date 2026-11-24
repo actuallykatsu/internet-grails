@@ -1,0 +1,28 @@
+---
+import WindowPage from '../../layouts/WindowPage.astro';
+import DropDay from '../../components/drops/DropDay.astro';
+import { getDropDays } from '../../lib/drops';
+import { formatDay } from '../../lib/drop';
+
+/** A page per day of drops (D25), e.g. /today/2026-11-24/. */
+export async function getStaticPaths() {
+  const days = await getDropDays();
+  return days.map(({ day, drops }, i) => ({
+    params: { day },
+    props: { drops, newer: days[i - 1]?.day, older: days[i + 1]?.day },
+  }));
+}
+
+const { day } = Astro.params;
+const { drops, newer, older } = Astro.props;
+const title = `Today's Grails: ${formatDay(day)}`;
+---
+
+<WindowPage
+  title={title}
+  windowTitle={`Today's Grails - ${day}`}
+  description={`Every meme and video Internet Grails dropped on ${formatDay(day)}.`}
+  searchable
+>
+  <DropDay day={day} drops={drops} newer={newer} older={older} />
+</WindowPage>

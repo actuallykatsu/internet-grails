@@ -1,0 +1,42 @@
+name: Sync drops
+
+# D25: when the iPhone Shortcut adds a drop (a file in src/content/drops), copy the X
+# post's text and media links into it so the site can draw it. Runs again every few
+# hours to retry any that failed; those show X's official embed until then.
+
+on:
+  push:
+    branches: [main]
+    paths: ['src/content/drops/**']
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: drops-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/sync-drops.mjs
+      - name: Commit filled-in drops
+        run: |
+          if git diff --quiet -- src/content/drops; then
+            echo "Nothing new to save."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/content/drops
+          git commit -m "Fill in drops from X"
+          git pull --rebase
+          git push

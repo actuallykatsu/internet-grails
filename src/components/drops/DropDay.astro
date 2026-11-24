@@ -1,0 +1,72 @@
+---
+/** One day of drops (D25): the feed plus links to the days either side. */
+import DropFeed from './DropFeed';
+import { dayHref, formatDay, type Drop } from '../../lib/drop';
+
+interface Props {
+  day: string;
+  drops: Drop[];
+  newer?: string;
+  older?: string;
+  heading?: string;
+}
+const { day, drops, newer, older, heading = formatDay(day) } = Astro.props;
+const memes = drops.filter((d) => d.kind === 'meme').length;
+const videos = drops.length - memes;
+const counts = [
+  videos && `${videos} ${videos === 1 ? 'video' : 'videos'}`,
+  memes && `${memes} ${memes === 1 ? 'meme' : 'memes'}`,
+].filter(Boolean);
+---
+
+<header class="ig-day__head">
+  <p class="ig-day__kicker">Today&rsquo;s Grails</p>
+  <h1>{heading}</h1>
+  <p class="ig-day__meta">{counts.join(' · ')}</p>
+</header>
+
+<DropFeed client:visible drops={drops} />
+
+<nav class="ig-day__nav" aria-label="Other days">
+  {newer ? (
+    <a class="ig-btn" href={dayHref(newer)}>
+      ◀ Newer: {formatDay(newer)}
+    </a>
+  ) : (
+    <span />
+  )}
+  {older && (
+    <a class="ig-btn" href={dayHref(older)}>
+      Older: {formatDay(older)} ▶
+    </a>
+  )}
+</nav>
+
+<style>
+  .ig-day__kicker {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ig-accent);
+    margin: 0;
+  }
+  .ig-day__head h1 {
+    margin: 0.2rem 0 0.3rem;
+  }
+  .ig-day__meta {
+    color: var(--ig-ink-soft);
+    margin: 0 0 1.2rem;
+  }
+  .ig-day__nav {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 1.5rem;
+  }
+  .ig-day__nav a {
+    text-decoration: none;
+    color: inherit;
+  }
+</style>

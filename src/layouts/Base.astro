@@ -33,6 +33,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta property="og:image" content={new URL('/logo.png', Astro.site)} />
     <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="alternate" type="application/rss+xml" title={SITE.name} href="/rss.xml" />
     {!index && <meta name="robots" content="noindex" />}
     <meta property="og:site_name" content={SITE.name} />
     <meta property="og:title" content={title ?? SITE.name} />
