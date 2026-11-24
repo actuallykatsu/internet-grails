@@ -178,3 +178,40 @@ test('article renders and the meme viewer opens', async ({ page }) => {
   await page.getByRole('button', { name: /Placeholder caption one/ }).click();
   await expect(page.getByRole('dialog', { name: 'Image viewer' })).toContainText('Credit:');
 });
+
+// D21: the contact form posts to a forms service when one is configured at build time
+// (CI sets a fake one and intercepts it); otherwise it falls back to the email app.
+test('contact form sends a message', async ({ page }) => {
+  await page.goto('/contact/');
+  await hydrated(page);
+  const form = page.locator('form.ig-form');
+  const mode = await form.getAttribute('data-mode');
+  if (mode === 'email') {
+    await expect(form).toHaveAttribute('action', 'mailto:marketing@internetgrails.com');
+    await expect(form).toContainText('Opens your email app');
+    return;
+  }
+
+  let sent: Record<string, string> = {};
+  let fail = true;
+  await page.route(String(await form.getAttribute('action')), async (route) => {
+    sent = route.request().postDataJSON();
+    if (fail) await route.fulfill({ status: 500, json: { success: false } });
+    else await route.fulfill({ json: { success: true } });
+  });
+  await form.getByLabel('Name').fill('Test Person');
+  await form.getByLabel('Email').fill('test@example.com');
+  await form.getByLabel('Message').fill('Hello from the smoke test.');
+
+  // A failed send keeps the message and offers the email address.
+  await form.getByRole('button', { name: 'Send' }).click();
+  await expect(form).toContainText('didn’t go through');
+  await expect(form.getByLabel('Message')).toHaveValue('Hello from the smoke test.');
+
+  fail = false;
+  await form.getByRole('button', { name: 'Send' }).click();
+  await expect(page.getByRole('status')).toContainText('Message sent');
+  await expect(page.getByRole('status')).toContainText('test@example.com');
+  expect(sent).toMatchObject({ name: 'Test Person', message: 'Hello from the smoke test.' });
+  expect(sent.website).toBeUndefined();
+});

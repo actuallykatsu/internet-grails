@@ -129,6 +129,11 @@
   margin: 0;
 }
 
+.ig-contact-card h3 {
+  font-size: 1.1rem;
+  margin: 18px 0 8px;
+}
+
 .ig-contact-card dl {
   display: grid;
   grid-template-columns: max-content 1fr;

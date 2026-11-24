@@ -17,7 +17,10 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run format:check
+      # A fake forms endpoint so the contact form test exercises the send path (D21).
       - run: npm run build
+        env:
+          PUBLIC_CONTACT_ENDPOINT: https://forms.example.test/contact
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
       - uses: actions/upload-artifact@v4

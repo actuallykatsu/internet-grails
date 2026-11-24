@@ -249,3 +249,53 @@ a {
   margin: 0;
   text-align: center;
 }
+
+/* Contact form (D21): used on /contact and in the desktop Contact window. */
+.ig-form {
+  display: grid;
+  gap: 12px;
+  max-width: 460px;
+}
+.ig-form label {
+  display: grid;
+  gap: 4px;
+  font-weight: 600;
+}
+.ig-form input,
+.ig-form textarea {
+  font: inherit;
+  font-weight: 400;
+  padding: 6px 8px;
+  border: 0;
+  background: #fff;
+  box-shadow: var(--ig-bevel-in);
+}
+.ig-form textarea {
+  resize: vertical;
+}
+.ig-form button {
+  justify-self: start;
+}
+.ig-form__trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.ig-form__note {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #555;
+}
+.ig-form__done {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  padding: 12px 14px;
+  background: #fff;
+  box-shadow: var(--ig-bevel-in);
+}
+.ig-form__done p {
+  margin: 0;
+}

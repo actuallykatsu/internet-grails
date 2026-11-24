@@ -1,6 +1,7 @@
 ---
 import WindowPage from '../layouts/WindowPage.astro';
 import { SITE } from '../lib/site';
+import ContactForm from '../components/ContactForm';
 ---
 
 <WindowPage
@@ -33,25 +34,7 @@ import { SITE } from '../lib/site';
   </dl>
 
   <h2>Send a message</h2>
-  <!--
-    TODO (Phase 1): wire to a form backend that delivers to marketing@internetgrails.com
-    (e.g. a Cloudflare/Vercel function or a forms service) with Turnstile.
-    Until then the form opens the visitor's email app.
-  -->
-  <form class="ig-form" action={`mailto:${SITE.email}`} method="post" enctype="text/plain">
-    <label>
-      Name <input name="name" autocomplete="name" required />
-    </label>
-    <label>
-      Email <input name="email" type="email" autocomplete="email" required />
-    </label>
-    <label>
-      Message <textarea name="message" rows="6" required></textarea>
-    </label>
-    <button class="ig-btn" type="submit">
-      Send
-    </button>
-  </form>
+  <ContactForm client:visible />
 </WindowPage>
 
 <style>
@@ -68,26 +51,7 @@ import { SITE } from '../lib/site';
   }
   .ig-official dd {
     margin: 0;
-  }
-  .ig-form {
-    display: grid;
-    gap: 12px;
-    max-width: 460px;
-  }
-  .ig-form label {
-    display: grid;
-    gap: 4px;
-    font-weight: 600;
-  }
-  .ig-form input,
-  .ig-form textarea {
-    font: inherit;
-    padding: 6px 8px;
-    border: 0;
-    background: #fff;
-    box-shadow: var(--ig-bevel-in);
-  }
-  .ig-form button {
-    justify-self: start;
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 </style>

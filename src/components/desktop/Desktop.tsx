@@ -5,6 +5,7 @@ import Taskbar, { PLAYER_START_ITEM, type StartItem } from './Taskbar';
 import { openPlayer } from '../../lib/player';
 import { useWindowManager, type WinSpec } from './useWindowManager';
 import { SECTIONS, SITE } from '../../lib/site';
+import ContactForm from '../ContactForm';
 import type { PostSummary } from '../../lib/posts';
 
 interface Props {
@@ -78,6 +79,8 @@ function ContactBody() {
         <dt>TikTok</dt>
         <dd>{SITE.tiktok ? <a href={SITE.tiktok.url}>{SITE.tiktok.handle}</a> : 'Coming soon'}</dd>
       </dl>
+      <h3>Send a message</h3>
+      <ContactForm compact />
       <p>
         <a href="/contact/">Open the full Contact page →</a>
       </p>
@@ -105,7 +108,7 @@ export default function Desktop({ posts, children }: Props) {
   const resolve = useCallback((id: string): WinSpec | undefined => {
     const icon = ICONS.find((i) => i.id === id);
     if (!icon) return undefined;
-    if (id === 'contact') return { id, title: 'Contact', w: 420, h: 380 };
+    if (id === 'contact') return { id, title: 'Contact', w: 460, h: 640 };
     if (id === 'about') return { id, title: 'About', w: 420, h: 260 };
     return { id, title: `C:\\Grails\\${icon.label}`, w: 560, h: 440 };
   }, []);

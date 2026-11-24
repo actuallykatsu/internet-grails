@@ -24,6 +24,7 @@ Astro 7 + TypeScript, React islands for the desktop/window manager, Markdown con
 - `src/content.config.ts`: the content model. Six post types: `news`, `meme-gallery`, `music-pick`, `trend-roundup`, `interview`, `daily-roundup`.
 - `src/content/posts/*.md`: posts (samples for now). `src/content/authors/*.json`: authors.
 - `src/components/desktop/`: window manager, desktop and taskbar. Open windows are mirrored to `?w=` so they can be linked.
+- `src/components/ContactForm.tsx`: the contact form, used on `/contact` and in the desktop Contact window. It posts to the forms service in `PUBLIC_CONTACT_ENDPOINT` (see `.env.example`), or opens the email app when that is unset.
 - `src/layouts/WindowPage.astro`: real-URL pages (articles, Contact, About) shown as a maximized window.
 - `src/styles/tokens.css`: design tokens.
 - `/mockups/trend-roundup`, `/mockups/mobile`: Phase 0 mockups.
@@ -35,5 +36,5 @@ Astro 7 + TypeScript, React islands for the desktop/window manager, Markdown con
 
 - TikTok handle in `src/lib/site.ts`.
 - About page copy.
-- Contact form currently uses `mailto:`; needs a form backend + Turnstile.
+- Contact form: set `PUBLIC_CONTACT_ENDPOINT` (and `PUBLIC_CONTACT_ACCESS_KEY` for Web3Forms) once a forms-service account exists. Copy `.env.example` to `.env` locally; for the deployed site, set them as build environment variables. Until then it opens the email app.
 - Sample posts and `public/samples/` images.
