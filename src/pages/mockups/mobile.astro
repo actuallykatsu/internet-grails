@@ -1,0 +1,348 @@
+---
+/**
+ * Phase 0 wireframes: the retro-phone mobile layout (plan: "Mobile"). Three static
+ * screens side by side: home, a section, and an article opened as a full-screen app.
+ * Nothing here is interactive yet; the real layout is Phase 1.
+ */
+import Base from '../../layouts/Base.astro';
+import Logo from '../../components/Logo.astro';
+import PixelIcon from '../../components/icons/PixelIcon';
+import type { IconName } from '../../components/icons/pixelIcons';
+import { SECTIONS, SITE } from '../../lib/site';
+import { getPublishedPosts, POST_TYPE_LABELS } from '../../lib/posts';
+
+const posts = await getPublishedPosts();
+const news = SECTIONS.find((s) => s.id === 'news')!;
+const newsTypes: readonly string[] = news.types;
+const newsPosts = posts.filter((p) => newsTypes.includes(p.data.type));
+const article = (newsPosts.length ? newsPosts : posts)[0];
+
+const apps: { label: string; icon: IconName }[] = [
+  ...SECTIONS.map(({ label, icon }) => ({ label, icon })),
+  { label: 'Player', icon: 'player' },
+  { label: 'Contact', icon: 'contact' },
+  { label: 'About', icon: 'about' },
+];
+const day = (d: Date) => d.toISOString().slice(0, 10);
+---
+
+<Base title="Mockup: Mobile" index={false}>
+  <main class="ig-mockup">
+    <p class="ig-mockup__note">
+      Phase 0 wireframes · <a href="/">back to desktop</a> · retro-phone layout, not interactive
+    </p>
+
+    <div class="ig-phones">
+      <figure>
+        <div class="ig-phone">
+          <div class="ig-phone__screen">
+            <div class="ig-phone__status">
+              <span>IG Mobile</span>
+              <span>▂▄▆ 9:41</span>
+            </div>
+            <div class="ig-phone__home">
+              <div class="ig-phone__logo">
+                <Logo size="mark" />
+              </div>
+              <ul class="ig-phone__apps">
+                {apps.map((a) => (
+                  <li>
+                    <PixelIcon name={a.icon} size={32} />
+                    <span>{a.label}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div class="ig-phone__mini">
+              <span>▶</span>
+              <span class="ig-phone__mini-title">Dial-Up Dreams</span>
+              <span>⏭</span>
+            </div>
+            <div class="ig-phone__strip">
+              X {SITE.x.handle} · {SITE.email}
+            </div>
+          </div>
+          <div class="ig-phone__keys" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+        <figcaption>
+          Home: sections are apps. The mini player sits above the official strip.
+        </figcaption>
+      </figure>
+
+      <figure>
+        <div class="ig-phone">
+          <div class="ig-phone__screen">
+            <div class="ig-phone__status">
+              <span>‹ Home</span>
+              <span>▂▄▆ 9:41</span>
+            </div>
+            <div class="ig-phone__bar">
+              <PixelIcon name="news" size={16} /> {news.label}
+            </div>
+            <ul class="ig-phone__list">
+              {(newsPosts.length ? newsPosts : posts).slice(0, 5).map((p) => (
+                <li>
+                  <strong>{p.data.title}</strong>
+                  <span>
+                    {POST_TYPE_LABELS[p.data.type]} · {day(p.data.date)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <div class="ig-phone__mini">
+              <span>▶</span>
+              <span class="ig-phone__mini-title">Dial-Up Dreams</span>
+              <span>⏭</span>
+            </div>
+            <div class="ig-phone__strip">
+              X {SITE.x.handle} · {SITE.email}
+            </div>
+          </div>
+          <div class="ig-phone__keys" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+        <figcaption>Section app: a list of posts, newest first.</figcaption>
+      </figure>
+
+      <figure>
+        <div class="ig-phone">
+          <div class="ig-phone__screen">
+            <div class="ig-phone__status">
+              <span>‹ {news.label}</span>
+              <span>▂▄▆ 9:41</span>
+            </div>
+            <div class="ig-phone__bar">{POST_TYPE_LABELS[article.data.type]}</div>
+            <article class="ig-phone__article">
+              <h2>{article.data.title}</h2>
+              <p class="ig-phone__meta">{day(article.data.date)}</p>
+              <p>{article.data.summary}</p>
+              <div class="ig-phone__ph" aria-hidden="true">
+                image
+              </div>
+              <p class="ig-phone__lines" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+              </p>
+            </article>
+            <div class="ig-phone__mini">
+              <span>▶</span>
+              <span class="ig-phone__mini-title">Dial-Up Dreams</span>
+              <span>⏭</span>
+            </div>
+            <div class="ig-phone__strip">
+              X {SITE.x.handle} · {SITE.email}
+            </div>
+          </div>
+          <div class="ig-phone__keys" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+        <figcaption>
+          Article: opens full screen like an app. The back arrow returns to the section.
+        </figcaption>
+      </figure>
+    </div>
+  </main>
+</Base>
+
+<style>
+  .ig-mockup {
+    min-height: 100vh;
+    padding: 24px 16px;
+    background: linear-gradient(160deg, var(--ig-desktop) 0%, var(--ig-desktop-deep) 100%);
+  }
+  .ig-mockup__note,
+  figcaption {
+    color: #fff;
+    text-align: center;
+    font-family: var(--ig-font-chrome);
+    font-size: 20px;
+  }
+  .ig-mockup__note a {
+    color: var(--ig-accent-2);
+  }
+  .ig-phones {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 32px;
+    margin-top: 24px;
+  }
+  figure {
+    margin: 0;
+    width: 280px;
+  }
+  figcaption {
+    margin-top: 10px;
+    font-size: 18px;
+  }
+
+  /* The handset: chrome shell, inset LCD, three hardware keys. */
+  .ig-phone {
+    padding: 18px 14px 14px;
+    border-radius: 34px;
+    background: var(--ig-metal);
+    box-shadow:
+      inset 0 0 0 2px var(--ig-ink),
+      0 12px 28px rgb(0 0 0 / 0.45);
+  }
+  .ig-phone__screen {
+    display: flex;
+    flex-direction: column;
+    height: 470px;
+    overflow: hidden;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #e9f6f2, #c7e3dc);
+    box-shadow:
+      inset 0 0 0 2px var(--ig-ink),
+      inset 0 3px 8px rgb(0 0 0 / 0.35);
+    font-family: var(--ig-font-chrome);
+    color: var(--ig-ink);
+  }
+  .ig-phone__status {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 10px;
+    background: var(--ig-ink);
+    color: var(--ig-accent-2);
+    font-size: 17px;
+  }
+  .ig-phone__home {
+    flex: 1;
+    padding: 10px;
+  }
+  .ig-phone__logo {
+    width: 72px;
+    margin: 4px auto 10px;
+  }
+  .ig-phone__apps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px 6px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .ig-phone__apps li {
+    display: grid;
+    justify-items: center;
+    gap: 2px;
+    font-size: 17px;
+    text-align: center;
+  }
+  .ig-phone__bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: linear-gradient(90deg, var(--ig-title-active-a), var(--ig-title-active-b));
+    color: #fff;
+    font-size: 19px;
+  }
+  .ig-phone__list {
+    flex: 1;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  .ig-phone__list li {
+    display: grid;
+    padding: 6px 10px;
+    border-bottom: 1px dashed rgb(20 20 20 / 0.3);
+    font-size: 17px;
+  }
+  .ig-phone__list span {
+    color: var(--ig-ink-soft);
+    font-size: 15px;
+  }
+  .ig-phone__article {
+    flex: 1;
+    padding: 8px 12px;
+    overflow: hidden;
+    background: var(--ig-paper);
+    font-family: var(--ig-font-body);
+    font-size: 13px;
+  }
+  .ig-phone__article h2 {
+    margin: 0 0 2px;
+    font-size: 17px;
+    line-height: 1.2;
+  }
+  .ig-phone__meta {
+    margin: 0 0 6px;
+    color: var(--ig-ink-soft);
+    font-size: 11px;
+  }
+  .ig-phone__ph {
+    display: grid;
+    place-items: center;
+    height: 90px;
+    margin: 8px 0;
+    border: 2px dashed var(--ig-chrome-mid);
+    color: var(--ig-chrome-mid);
+  }
+  .ig-phone__lines {
+    display: grid;
+    gap: 6px;
+  }
+  .ig-phone__lines span {
+    height: 8px;
+    border-radius: 4px;
+    background: #e1ded6;
+  }
+  .ig-phone__lines span:last-child {
+    width: 60%;
+  }
+  .ig-phone__mini {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 4px 10px;
+    background: #021a20;
+    color: var(--ig-accent-2);
+    font-size: 17px;
+  }
+  .ig-phone__mini-title {
+    flex: 1;
+  }
+  .ig-phone__strip {
+    padding: 3px 8px;
+    background: var(--ig-chrome);
+    border-top: 1px solid var(--ig-chrome-dark);
+    font-size: 14px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ig-phone__keys {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    margin-top: 12px;
+  }
+  .ig-phone__keys span {
+    width: 46px;
+    height: 16px;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #fff, #8f97a3);
+    box-shadow: inset 0 0 0 2px var(--ig-ink);
+  }
+  .ig-phone__keys span:nth-child(2) {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+  }
+</style>

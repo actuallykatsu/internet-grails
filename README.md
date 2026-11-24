@@ -26,7 +26,8 @@ Astro 7 + TypeScript, React islands for the desktop/window manager, Markdown con
 - `src/components/desktop/`: window manager, desktop and taskbar. Open windows are mirrored to `?w=` so they can be linked.
 - `src/layouts/WindowPage.astro`: real-URL pages (articles, Contact, About) shown as a maximized window.
 - `src/styles/tokens.css`: design tokens.
-- `/mockups/trend-roundup`: Phase 0 mockup.
+- `/mockups/trend-roundup`, `/mockups/media-player`, `/mockups/mobile`: Phase 0 mockups.
+- `src/components/icons/pixelIcons.ts`: the pixel icons, one text grid per icon (D16).
 - `src/components/Logo.astro`: the logo (`full` wordmark or compact `mark`). Its paths come from `nostalgia_logo_v1.png`; after changing the artwork, run `node scripts/trace-logo.mjs` (and update `SPARKLE_HINTS` / `FOREGROUND_HINTS` there if sparkles or the pieces in front of the globe move). The spinning globe lives in `src/components/logo/globe.ts`; set `LOGO_VARIANT = 'classic'` in `src/lib/site.ts` to go back to the flat logo.
 
 ## Placeholders to replace

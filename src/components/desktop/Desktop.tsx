@@ -1,5 +1,6 @@
 import { useCallback, useState, type ReactNode } from 'react';
 import Window from './Window';
+import PixelIcon from '../icons/PixelIcon';
 import Taskbar, { type StartItem } from './Taskbar';
 import { useWindowManager, type WinSpec } from './useWindowManager';
 import { SECTIONS, SITE } from '../../lib/site';
@@ -12,15 +13,17 @@ interface Props {
 }
 
 const EXTRA_ICONS = [
-  { id: 'contact', label: 'Contact', icon: '📇' },
-  { id: 'about', label: 'About', icon: 'ℹ️' },
+  { id: 'contact', label: 'Contact', icon: 'contact' },
+  { id: 'about', label: 'About', icon: 'about' },
 ] as const;
 
 const ICONS = [...SECTIONS.map(({ id, label, icon }) => ({ id, label, icon })), ...EXTRA_ICONS];
 
 const START_ITEMS: StartItem[] = [
   ...ICONS.map(({ id, label, icon }) => ({ label, icon, windowId: id })),
-  { label: 'Trend roundup mockup', icon: '🧪', href: '/mockups/trend-roundup' },
+  { label: 'Trend roundup mockup', icon: 'mockup', href: '/mockups/trend-roundup' },
+  { label: 'Media player mockup', icon: 'player', href: '/mockups/media-player' },
+  { label: 'Mobile mockup', icon: 'mockup', href: '/mockups/mobile' },
 ];
 
 function postsFor(sectionId: string, posts: PostSummary[]) {
@@ -131,8 +134,8 @@ export default function Desktop({ posts, children }: Props) {
                 }
               }}
             >
-              <span className="ig-icon__img" aria-hidden="true">
-                {icon.icon}
+              <span className="ig-icon__img">
+                <PixelIcon name={icon.icon} size={32} />
               </span>
               <span className="ig-icon__label">{icon.label}</span>
             </button>

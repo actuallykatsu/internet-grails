@@ -1,0 +1,219 @@
+/**
+ * Original 16×16 pixel-art icons (era-inspired, drawn for Internet Grails; D16).
+ * Each icon is 16 rows of 16 characters. One character per pixel, colours below.
+ * Edit a row, keep it exactly 16 characters, and the icon updates everywhere.
+ */
+export const PALETTE: Record<string, string> = {
+  k: '#141414', // ink outline
+  w: '#ffffff',
+  g: '#c9ced6', // light metal
+  d: '#6f7682', // dark metal
+  c: '#33e1ff', // cyan
+  s: '#8fd8ff', // sky
+  b: '#3a76d8', // blue
+  p: '#ff3ea5', // pink
+  y: '#f2b705', // yellow
+  G: '#23b04b', // green
+  t: '#0f5c63', // teal
+};
+
+export const ICONS = {
+  memes: [
+    '................',
+    '.kkkkkkkkkkkkkk.',
+    '.kggggggggggggk.',
+    '.kgkkkkkkkkkkgk.',
+    '.kgkssssssyykgk.',
+    '.kgkssssssyykgk.',
+    '.kgksssssssskgk.',
+    '.kgksssGsssskgk.',
+    '.kgkssGGGssskgk.',
+    '.kgksGGGGGsGkgk.',
+    '.kgkGGGGGGGGkgk.',
+    '.kgkGGGGGGGGkgk.',
+    '.kgkkkkkkkkkkgk.',
+    '.kggggggggggggk.',
+    '.kkkkkkkkkkkkkk.',
+    '................',
+  ],
+  music: [
+    '................',
+    '.....kkkkkkkkkk.',
+    '.....kppppppppk.',
+    '.....kpkkkkkkpk.',
+    '.....kpk....kpk.',
+    '.....kpk....kpk.',
+    '.....kpk....kpk.',
+    '.....kpk....kpk.',
+    '.....kpk....kpk.',
+    '..kkkkpk.kkkkpk.',
+    '.kpwpppkkpwpppk.',
+    '.kpppppkkpppppk.',
+    '..kkkkk..kkkkk..',
+    '................',
+    '................',
+    '................',
+  ],
+  trends: [
+    '................',
+    '.kkkkkkkkkkkkkk.',
+    '.kdwwwwwwwwwwwk.',
+    '.kdwwwwwwwwpppk.',
+    '.kdwwwwwwwwwppk.',
+    '.kdwwwwwwwwGwpk.',
+    '.kdwwwwwwwGwwwk.',
+    '.kdwwwwwwGwwwwk.',
+    '.kdwwwGwGwwwwwk.',
+    '.kdwwGwGwwwwwwk.',
+    '.kdwGwwwwwwwwwk.',
+    '.kdGwwwwwwwwwwk.',
+    '.kddddddddddddk.',
+    '.kkkkkkkkkkkkkk.',
+    '................',
+    '................',
+  ],
+  news: [
+    '................',
+    '..kkkkkkkkkkkk..',
+    '..kwwwwwwwwwwk..',
+    '..kwkkkkkkkkwk..',
+    '..kwwwwwwwwwwk..',
+    '..kwbbbbwdddwk..',
+    '..kwbbbbwwwwwk..',
+    '..kwbbbbwdddwk..',
+    '..kwwwwwwwwwwk..',
+    '..kwddddwdddwk..',
+    '..kwwwwwwwwwwk..',
+    '..kwddddwdddwk..',
+    '..kwwwwwwwwwwk..',
+    '..kkkkkkkkkkkk..',
+    '................',
+    '................',
+  ],
+  vault: [
+    '................',
+    '.kkkkkkkkkkkkkk.',
+    '.kggggggggggggk.',
+    '.kgddddddddddgk.',
+    '.kgdddkkkkdddgk.',
+    '.kgddkyyyykddgk.',
+    '.kgdkyykkyykdgk.',
+    '.kgdkykwwkykdgk.',
+    '.kgdkykwwkykdgk.',
+    '.kgdkyykkyykdgk.',
+    '.kgddkyyyykddgk.',
+    '.kgdddkkkkdddgk.',
+    '.kgddddddddddgk.',
+    '.kggggggggggggk.',
+    '.kkkkkkkkkkkkkk.',
+    '.kk..........kk.',
+  ],
+  contact: [
+    '................',
+    '...kk......kk...',
+    '.kkkkkkkkkkkkkk.',
+    '.kwwwwwwwwwwwwk.',
+    '.kwwbbwwdddddwk.',
+    '.kwbbbbwwwwwwwk.',
+    '.kwwbbwwddddwwk.',
+    '.kwbbbbwwwwwwwk.',
+    '.kbbbbbbwdddwwk.',
+    '.kbbbbbbwwwwwwk.',
+    '.kwwwwwwwwwwwwk.',
+    '.kkkkkkkkkkkkkk.',
+    '.....kkkkkk.....',
+    '....kddddddk....',
+    '....kkkkkkkk....',
+    '................',
+  ],
+  about: [
+    '................',
+    '.....kkkkkk.....',
+    '...kkbbbbbbkk...',
+    '..kbbbbwwbbbbk..',
+    '.kbcbbbwwbbbbbk.',
+    '.kbcbbbbbbbbbbk.',
+    'kbbbbbwwwbbbbbbk',
+    'kbbbbbbwwbbbbbbk',
+    'kbbbbbbwwbbbbbbk',
+    'kbbbbbbwwbbbbbbk',
+    '.kbbbbbwwbbbbbk.',
+    '.kbbbbwwwwbbbbk.',
+    '..kbbbbbbbbbbk..',
+    '...kkbbbbbbkk...',
+    '.....kkkkkk.....',
+    '................',
+  ],
+  desktop: [
+    '................',
+    '.kkkkkkkkkkkkkk.',
+    '.kggggggggggggk.',
+    '.kgkkkkkkkkkkgk.',
+    '.kgkctttttttkgk.',
+    '.kgkttttttttkgk.',
+    '.kgkttttttttkgk.',
+    '.kgkttttttttkgk.',
+    '.kgkttttttttkgk.',
+    '.kgkttttttttkgk.',
+    '.kgkkkkkkkkkkgk.',
+    '.kgggggggggGggk.',
+    '.kkkkkkkkkkkkkk.',
+    '......kggk......',
+    '....kkkkkkkk....',
+    '................',
+  ],
+  player: [
+    '................',
+    '.....kkkkkk.....',
+    '...kkggggggkk...',
+    '..kggcggggggdk..',
+    '.kggccgggggggdk.',
+    '.kgccggggggggdk.',
+    'kggcgggkkggggddk',
+    'kgggggkwwkggggdk',
+    'kgggggkwwkgggddk',
+    'kggggggkkggggddk',
+    '.kgggggggggpddk.',
+    '.kggggggggpdddk.',
+    '..kgggggggdddk..',
+    '...kkddddddkk...',
+    '.....kkkkkk.....',
+    '................',
+  ],
+  mockup: [
+    '................',
+    '.....kkkkkk.....',
+    '......kwwk......',
+    '......kwwk......',
+    '......kwwk......',
+    '.....kwwwwk.....',
+    '....kwwwwwwk....',
+    '...kwwwwwwwwk...',
+    '..kppppppppppk..',
+    '..kpwppppppppk..',
+    '.kppppppppppppk.',
+    '.kpppppwppppppk.',
+    '.kppppppppppppk.',
+    '.kkkkkkkkkkkkkk.',
+    '................',
+    '................',
+  ],
+} as const satisfies Record<string, readonly string[]>;
+
+export type IconName = keyof typeof ICONS;
+
+/** Horizontal runs of same-coloured pixels, so each icon is a handful of rects. */
+export function iconRects(name: IconName) {
+  const rects: { x: number; y: number; w: number; fill: string }[] = [];
+  ICONS[name].forEach((row, y) => {
+    let x = 0;
+    while (x < row.length) {
+      const ch = row[x];
+      let end = x + 1;
+      while (end < row.length && row[end] === ch) end++;
+      if (ch !== '.') rects.push({ x, y, w: end - x, fill: PALETTE[ch] });
+      x = end;
+    }
+  });
+  return rects;
+}

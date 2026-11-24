@@ -43,6 +43,24 @@ test('logo globe spins, slowly for reduced motion', async ({ browser }) => {
   }
 });
 
+test('media player mockup plays and changes track', async ({ page }) => {
+  await page.goto('/mockups/media-player/');
+  await hydrated(page);
+  const player = page.getByRole('region', { name: /Media player/ });
+  await player.getByRole('button', { name: 'Play' }).click();
+  await expect(player).toContainText('0:01 /');
+  await player.getByRole('button', { name: 'Next track' }).click();
+  await expect(player.getByRole('button', { name: /Away Message/ })).toHaveAttribute(
+    'aria-current',
+    'true',
+  );
+});
+
+test('mobile wireframes render three screens', async ({ page }) => {
+  await page.goto('/mockups/mobile/');
+  await expect(page.locator('.ig-phone')).toHaveCount(3);
+});
+
 test('window is restorable from a link', async ({ page }) => {
   await page.goto('/?w=contact');
   await expect(page.getByRole('dialog', { name: 'Contact' })).toBeVisible();

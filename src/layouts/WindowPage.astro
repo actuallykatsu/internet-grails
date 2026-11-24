@@ -6,6 +6,7 @@
 import Base from './Base.astro';
 import Taskbar from '../components/desktop/Taskbar';
 import { SECTIONS } from '../lib/site';
+import type { StartItem } from '../components/desktop/Taskbar';
 
 interface Props {
   title: string;
@@ -16,11 +17,11 @@ interface Props {
 
 const { title, windowTitle = title, description, index } = Astro.props;
 
-const startItems = [
-  { label: 'Desktop', icon: '🖥️', href: '/' },
+const startItems: StartItem[] = [
+  { label: 'Desktop', icon: 'desktop', href: '/' },
   ...SECTIONS.map(({ id, label, icon }) => ({ label, icon, href: `/?w=${id}` })),
-  { label: 'Contact', icon: '📇', href: '/contact/' },
-  { label: 'About', icon: 'ℹ️', href: '/about/' },
+  { label: 'Contact', icon: 'contact', href: '/contact/' },
+  { label: 'About', icon: 'about', href: '/about/' },
 ];
 ---
 

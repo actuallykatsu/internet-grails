@@ -14,11 +14,11 @@ export const SITE = {
 } as const;
 
 export const SECTIONS = [
-  { id: 'memes', label: 'Memes', icon: '🖼️', types: ['meme-gallery'] },
-  { id: 'music', label: 'Music', icon: '🎵', types: ['music-pick'] },
-  { id: 'trends', label: 'Trends', icon: '📈', types: ['trend-roundup'] },
-  { id: 'news', label: 'News', icon: '📰', types: ['news', 'daily-roundup', 'interview'] },
-  { id: 'vault', label: 'The Vault', icon: '🗄️', types: 'all' },
+  { id: 'memes', label: 'Memes', icon: 'memes', types: ['meme-gallery'] },
+  { id: 'music', label: 'Music', icon: 'music', types: ['music-pick'] },
+  { id: 'trends', label: 'Trends', icon: 'trends', types: ['trend-roundup'] },
+  { id: 'news', label: 'News', icon: 'news', types: ['news', 'daily-roundup', 'interview'] },
+  { id: 'vault', label: 'The Vault', icon: 'vault', types: 'all' },
 ] as const;
 
 export type SectionId = (typeof SECTIONS)[number]['id'];

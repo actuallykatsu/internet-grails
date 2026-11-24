@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { SITE } from '../../lib/site';
+import PixelIcon from '../icons/PixelIcon';
+import type { IconName } from '../icons/pixelIcons';
 
 export interface StartItem {
   label: string;
-  icon: string;
+  icon: IconName;
   /** Opens a desktop window when on the desktop... */
   windowId?: string;
   /** ...or navigates to a real URL. */
@@ -88,11 +90,11 @@ export default function Taskbar({ startItems, windows = [], onStartItem, onWindo
                         onStartItem(item);
                       }}
                     >
-                      <span aria-hidden="true">{item.icon}</span> {item.label}
+                      <PixelIcon name={item.icon} size={16} /> {item.label}
                     </button>
                   ) : (
                     <a role="menuitem" href={item.href ?? `/?w=${item.windowId}`}>
-                      <span aria-hidden="true">{item.icon}</span> {item.label}
+                      <PixelIcon name={item.icon} size={16} /> {item.label}
                     </a>
                   )}
                 </li>

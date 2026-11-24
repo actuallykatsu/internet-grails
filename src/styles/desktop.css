@@ -44,9 +44,15 @@
 }
 
 .ig-icon__img {
-  font-size: 34px;
-  line-height: 1;
+  display: block;
+  line-height: 0;
   filter: drop-shadow(1px 2px 0 rgb(0 0 0 / 0.35));
+}
+
+/* Pixel icons (D16): keep pixels square at any zoom. */
+.ig-pixel {
+  flex: none;
+  image-rendering: pixelated;
 }
 
 .ig-icon__label {
@@ -207,6 +213,7 @@
 
 .ig-start__menu [role='menuitem'] {
   display: flex;
+  align-items: center;
   gap: 10px;
   width: 100%;
   padding: 7px 10px;
