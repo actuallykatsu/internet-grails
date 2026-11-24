@@ -71,6 +71,15 @@ export default function Window({
         onDoubleClick={onToggleMax}
         style={{ cursor: win.maximized ? 'default' : 'move', touchAction: 'none' }}
       >
+        {/* Phone layout only (D20): windows are full-screen apps with a back arrow. */}
+        <button
+          className="ig-titlebar__back"
+          type="button"
+          aria-label="Back to home"
+          onClick={onClose}
+        >
+          ‹
+        </button>
         <span className="ig-titlebar__title">{win.title}</span>
         <button
           className="ig-titlebar__btn"

@@ -5,6 +5,7 @@ import Embed from '../../components/Embed.astro';
 import TrendList from '../../components/TrendList.astro';
 import MemeGallery from '../../components/MemeGallery';
 import { getPublishedPosts, formatDate, POST_TYPE_LABELS, type Post } from '../../lib/posts';
+import { SECTIONS } from '../../lib/site';
 
 export async function getStaticPaths() {
   const posts = await getPublishedPosts();
@@ -24,9 +25,20 @@ const windowTitle =
   data.type === 'interview'
     ? `Now Showing: ${data.title}`
     : `${POST_TYPE_LABELS[data.type]} - ${data.title}`;
+
+// The phone layout's back arrow returns to the post's section app (D20).
+const section = SECTIONS.find(
+  (s) => s.types !== 'all' && (s.types as readonly string[]).includes(data.type),
+);
+const backHref = section ? `/?w=${section.id}` : '/';
 ---
 
-<WindowPage title={data.title} windowTitle={windowTitle} description={data.summary}>
+<WindowPage
+  title={data.title}
+  windowTitle={windowTitle}
+  description={data.summary}
+  backHref={backHref}
+>
   <header class="ig-article__head">
     <p class="ig-article__kicker">{POST_TYPE_LABELS[data.type]}</p>
     <h1>{data.title}</h1>

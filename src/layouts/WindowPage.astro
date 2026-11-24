@@ -13,9 +13,11 @@ interface Props {
   windowTitle?: string;
   description?: string;
   index?: boolean;
+  /** Where the phone layout's back arrow goes (D20). */
+  backHref?: string;
 }
 
-const { title, windowTitle = title, description, index } = Astro.props;
+const { title, windowTitle = title, description, index, backHref = '/' } = Astro.props;
 
 const startItems: StartItem[] = [
   { label: 'Desktop', icon: 'desktop', href: '/' },
@@ -30,6 +32,9 @@ const startItems: StartItem[] = [
   <div class="ig-page">
     <article class="ig-window ig-page__window" data-active="true">
       <div class="ig-titlebar">
+        <a class="ig-titlebar__back" href={backHref} aria-label="Back">
+          ‹
+        </a>
         <span class="ig-titlebar__title">{windowTitle}</span>
         <a class="ig-titlebar__btn" href="/" aria-label="Minimize to desktop">
           _
@@ -68,5 +73,17 @@ const startItems: StartItem[] = [
   }
   .ig-window__body {
     padding: clamp(16px, 4vw, 48px) clamp(14px, 4vw, 32px);
+  }
+  /* Phone layout (D20): the page sits under the status bar like a full-screen app. */
+  @media (max-width: 700px) {
+    .ig-page {
+      padding-top: var(--ig-status-h);
+    }
+    .ig-page__window {
+      min-height: calc(100vh - var(--ig-taskbar-h) - var(--ig-status-h));
+    }
+    .ig-page__window .ig-titlebar {
+      top: var(--ig-status-h);
+    }
   }
 </style>

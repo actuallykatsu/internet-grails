@@ -280,18 +280,130 @@
   font-size: 18px;
 }
 
-/* Narrow screens: placeholder until the retro-phone layout lands (Phase 1). */
 @media (max-width: 860px) {
   .ig-tray__contact {
     display: none;
   }
 }
 
+/* ---------- Retro-phone layout (D20) ----------
+ * Under 700px the desktop turns into a handset: a status bar on top, the logo and an
+ * app grid as the home screen, windows and articles as full-screen apps with a back
+ * arrow, and the taskbar as the official contact strip. Pure CSS, so no layout flash. */
+.ig-phone-status,
+.ig-titlebar__back {
+  display: none;
+}
+
 @media (max-width: 700px) {
+  :root {
+    --ig-status-h: 26px;
+    --ig-taskbar-h: 30px;
+  }
+
+  .ig-phone-status {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: var(--ig-status-h);
+    padding: 0 10px;
+    background: var(--ig-ink);
+    color: var(--ig-accent-2);
+    font-family: var(--ig-font-chrome);
+    font-size: 18px;
+  }
+
+  /* Bottom bar: just the official strip and the sound button. */
+  .ig-start,
+  .ig-taskbar__windows,
+  .ig-tray__clock {
+    display: none;
+  }
+  .ig-taskbar {
+    padding: 0;
+  }
+  .ig-tray {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    justify-content: center;
+    padding: 0 8px;
+    box-shadow: none;
+  }
+  .ig-tray__contact {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 16px;
+  }
+
+  /* Home screen: logo on top, three-column app grid. */
+  .ig-desktop {
+    padding-top: var(--ig-status-h);
+    overflow-y: auto;
+  }
+  .ig-desktop__wordmark {
+    position: static;
+    width: min(80vw, 330px);
+    margin: 16px auto 6px;
+  }
   .ig-icons {
     grid-auto-flow: row;
-    grid-template-columns: repeat(auto-fill, minmax(86px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     grid-template-rows: none;
     width: auto;
+    height: auto;
+    gap: 12px 4px;
+    padding: 8px 12px calc(var(--ig-taskbar-h) + 64px);
+  }
+  .ig-icon {
+    width: 100%;
+  }
+  .ig-icon__img .ig-pixel {
+    width: 48px;
+    height: 48px;
+  }
+
+  /* Windows become full-screen apps. */
+  .ig-desk-window {
+    inset: var(--ig-status-h) 0 var(--ig-taskbar-h) 0 !important;
+    width: auto !important;
+    height: auto !important;
+    border-radius: 0;
+  }
+  .ig-titlebar {
+    height: 36px;
+    cursor: default !important;
+  }
+  .ig-titlebar__btn {
+    display: none;
+  }
+  .ig-titlebar__back {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #fff;
+    font-family: var(--ig-font-chrome);
+    font-size: 34px;
+    line-height: 1;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  /* Article and info pages: see WindowPage.astro. */
+
+  /* Leave room for the mini player when it's showing. */
+  body:has(.ig-player-mini) .ig-window__body {
+    padding-bottom: 64px;
   }
 }

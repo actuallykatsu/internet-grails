@@ -10,10 +10,31 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => sessionStorage.setItem('ig-booted', '1'));
 });
 
-test('desktop loads with icons and taskbar', async ({ page }) => {
+test('desktop loads with icons and taskbar', async ({ page, isMobile }) => {
   await page.goto('/');
   await expect(page.getByRole('button', { name: 'Memes' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Start' })).toBeVisible();
+  // Phones swap the Start button for a status bar (D20).
+  await expect(page.getByRole('button', { name: 'Start' })).toBeVisible({ visible: !isMobile });
+  await expect(page.locator('.ig-phone-status')).toBeVisible({ visible: isMobile });
+});
+
+test('phone layout: apps fill the screen and back goes home', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'phone layout only');
+  await page.goto('/?w=news');
+  await hydrated(page);
+  const news = page.getByRole('dialog', { name: /News/ });
+  // Poll: the window scales in with an open animation.
+  await expect
+    .poll(async () => Math.round((await news.boundingBox())?.width ?? 0))
+    .toBe(page.viewportSize()?.width);
+  await news.getByRole('link', { name: /Welcome to Internet Grails/ }).tap();
+  await expect(page).toHaveURL(/\/posts\//);
+  await page.getByRole('link', { name: 'Back', exact: true }).tap();
+  await expect(page).toHaveURL(/\?w=news/);
+  await hydrated(page);
+  await page.getByRole('button', { name: 'Back to home' }).tap();
+  await expect(news).toBeHidden();
+  await expect(page).not.toHaveURL(/\?w=/);
 });
 
 test('opening a section window updates the URL', async ({ page, isMobile }) => {
@@ -46,8 +67,14 @@ test('logo globe spins, slowly for reduced motion', async ({ browser }) => {
 test('background player plays, minimizes and survives navigation', async ({ page, isMobile }) => {
   await page.goto('/?w=contact');
   await hydrated(page);
-  await page.getByRole('button', { name: 'Start' }).click();
-  await page.getByRole('menuitem', { name: 'Grail Player' }).click();
+  if (isMobile) {
+    // Phones have no Start menu (D20): close the app, then tap the home-screen icon.
+    await page.getByRole('button', { name: 'Back to home' }).tap();
+    await page.getByRole('button', { name: 'Grail Player' }).tap();
+  } else {
+    await page.getByRole('button', { name: 'Start' }).click();
+    await page.getByRole('menuitem', { name: 'Grail Player' }).click();
+  }
   const player = page.getByRole('region', { name: 'Grail Player' });
   await player.getByRole('button', { name: 'Play', exact: true }).click();
   await expect(player).toContainText('0:01 /');
@@ -57,29 +84,28 @@ test('background player plays, minimizes and survives navigation', async ({ page
     'true',
   );
 
-  // Minimize to the taskbar, then restore from it.
+  // Minimize, restore, and change page client-side: the same player keeps playing.
   await player.getByRole('button', { name: 'Minimize player' }).click();
   await expect(player).toBeHidden();
+  const miniBar = page.getByRole('region', { name: 'Now playing' });
   if (isMobile) {
-    // Phones get a mini player bar instead (the taskbar is cramped there).
-    await page
-      .getByRole('region', { name: 'Now playing' })
-      .getByRole('button', { name: /Away Message/ })
-      .click();
+    // Phones get a mini player bar instead of a taskbar button; reopen Contact behind it.
+    await page.getByRole('button', { name: 'Contact' }).tap();
   } else {
     await page
       .getByRole('navigation', { name: 'Open windows' })
       .getByRole('button', { name: 'Grail Player' })
       .click();
+    await expect(player).toBeVisible();
   }
-  await expect(player).toBeVisible();
 
-  // A client-side page change keeps the same player, still on the same track and playing.
   await page.evaluate(() => ((window as unknown as { igMarker: boolean }).igMarker = true));
   await page.getByRole('link', { name: /full Contact page/ }).click();
   await expect(page).toHaveURL(/\/contact\/$/);
   const marker = await page.evaluate(() => (window as unknown as { igMarker?: boolean }).igMarker);
   expect(marker, 'navigation should not reload the page').toBe(true);
+  if (isMobile) await miniBar.getByRole('button', { name: /Away Message/ }).tap();
+  await expect(player).toBeVisible();
   await expect(player).toContainText('Away Message');
   await expect(player.getByRole('button', { name: 'Pause', exact: true })).toBeVisible();
 });

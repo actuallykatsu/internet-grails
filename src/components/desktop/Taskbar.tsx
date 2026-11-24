@@ -25,7 +25,7 @@ interface Props {
   onWindowButton?: (id: string) => void;
 }
 
-function Clock() {
+function Clock({ className = 'ig-tray__clock' }: { className?: string }) {
   const [now, setNow] = useState<Date | null>(null);
   useEffect(() => {
     const tick = () => setNow(new Date());
@@ -37,7 +37,7 @@ function Clock() {
     };
   }, []);
   return (
-    <time className="ig-tray__clock" dateTime={now?.toISOString()}>
+    <time className={className} dateTime={now?.toISOString()}>
       {now ? now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '--:--'}
     </time>
   );
@@ -70,101 +70,110 @@ export default function Taskbar({ startItems, windows = [], onStartItem, onWindo
   }, [menuOpen]);
 
   return (
-    <footer className="ig-taskbar">
-      <div className="ig-start" ref={menuRef}>
-        <button
-          type="button"
-          className="ig-btn ig-start__btn"
-          aria-haspopup="menu"
-          aria-expanded={menuOpen}
-          aria-pressed={menuOpen}
-          onClick={() => setMenuOpen((o) => !o)}
-        >
-          <img className="ig-start__orb" src="/favicon.svg" alt="" width="22" height="22" />
-          Start
-        </button>
-        {menuOpen && (
-          <div className="ig-start__menu" role="menu" aria-label="Start menu">
-            <div className="ig-start__rail" aria-hidden="true">
-              Internet Grails
+    <>
+      {/* Phone layout only (D20): the handset's status bar. */}
+      <div className="ig-phone-status" aria-hidden="true">
+        <span>IG Mobile</span>
+        <span>
+          ▂▄▆ <Clock className="ig-phone-status__clock" />
+        </span>
+      </div>
+      <footer className="ig-taskbar">
+        <div className="ig-start" ref={menuRef}>
+          <button
+            type="button"
+            className="ig-btn ig-start__btn"
+            aria-haspopup="menu"
+            aria-expanded={menuOpen}
+            aria-pressed={menuOpen}
+            onClick={() => setMenuOpen((o) => !o)}
+          >
+            <img className="ig-start__orb" src="/favicon.svg" alt="" width="22" height="22" />
+            Start
+          </button>
+          {menuOpen && (
+            <div className="ig-start__menu" role="menu" aria-label="Start menu">
+              <div className="ig-start__rail" aria-hidden="true">
+                Internet Grails
+              </div>
+              <ul>
+                {startItems.map((item) => (
+                  <li key={item.label}>
+                    {item.player ? (
+                      <button
+                        type="button"
+                        role="menuitem"
+                        onClick={() => {
+                          setMenuOpen(false);
+                          openPlayer();
+                        }}
+                      >
+                        <PixelIcon name={item.icon} size={16} /> {item.label}
+                      </button>
+                    ) : item.windowId && onStartItem ? (
+                      <button
+                        type="button"
+                        role="menuitem"
+                        onClick={() => {
+                          setMenuOpen(false);
+                          onStartItem(item);
+                        }}
+                      >
+                        <PixelIcon name={item.icon} size={16} /> {item.label}
+                      </button>
+                    ) : (
+                      <a role="menuitem" href={item.href ?? `/?w=${item.windowId}`}>
+                        <PixelIcon name={item.icon} size={16} /> {item.label}
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
             </div>
-            <ul>
-              {startItems.map((item) => (
-                <li key={item.label}>
-                  {item.player ? (
-                    <button
-                      type="button"
-                      role="menuitem"
-                      onClick={() => {
-                        setMenuOpen(false);
-                        openPlayer();
-                      }}
-                    >
-                      <PixelIcon name={item.icon} size={16} /> {item.label}
-                    </button>
-                  ) : item.windowId && onStartItem ? (
-                    <button
-                      type="button"
-                      role="menuitem"
-                      onClick={() => {
-                        setMenuOpen(false);
-                        onStartItem(item);
-                      }}
-                    >
-                      <PixelIcon name={item.icon} size={16} /> {item.label}
-                    </button>
-                  ) : (
-                    <a role="menuitem" href={item.href ?? `/?w=${item.windowId}`}>
-                      <PixelIcon name={item.icon} size={16} /> {item.label}
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      <nav className="ig-taskbar__windows" aria-label="Open windows">
-        {windows.map((w) => (
-          <button
-            key={w.id}
-            type="button"
-            className="ig-btn ig-taskbar__win"
-            aria-pressed={w.active}
-            onClick={() => onWindowButton?.(w.id)}
-          >
-            {w.title}
-          </button>
-        ))}
-        {player.open && (
+        <nav className="ig-taskbar__windows" aria-label="Open windows">
+          {windows.map((w) => (
+            <button
+              key={w.id}
+              type="button"
+              className="ig-btn ig-taskbar__win"
+              aria-pressed={w.active}
+              onClick={() => onWindowButton?.(w.id)}
+            >
+              {w.title}
+            </button>
+          ))}
+          {player.open && (
+            <button
+              type="button"
+              className="ig-btn ig-taskbar__win"
+              aria-pressed={!player.minimized}
+              onClick={togglePlayerMinimized}
+            >
+              Grail Player
+            </button>
+          )}
+        </nav>
+
+        <div className="ig-tray">
+          <p className="ig-contact-strip ig-tray__contact">
+            Official X: <a href={SITE.x.url}>{SITE.x.handle}</a> ·{' '}
+            <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+          </p>
           <button
             type="button"
-            className="ig-btn ig-taskbar__win"
-            aria-pressed={!player.minimized}
-            onClick={togglePlayerMinimized}
+            className="ig-tray__sound"
+            aria-label={player.muted ? 'Sound off. Turn sound on' : 'Sound on. Turn sound off'}
+            aria-pressed={!player.muted}
+            onClick={toggleMuted}
           >
-            Grail Player
+            {player.muted ? '🔇' : '🔊'}
           </button>
-        )}
-      </nav>
-
-      <div className="ig-tray">
-        <p className="ig-contact-strip ig-tray__contact">
-          Official X: <a href={SITE.x.url}>{SITE.x.handle}</a> ·{' '}
-          <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
-        </p>
-        <button
-          type="button"
-          className="ig-tray__sound"
-          aria-label={player.muted ? 'Sound off. Turn sound on' : 'Sound on. Turn sound off'}
-          aria-pressed={!player.muted}
-          onClick={toggleMuted}
-        >
-          {player.muted ? '🔇' : '🔊'}
-        </button>
-        <Clock />
-      </div>
-    </footer>
+          <Clock />
+        </div>
+      </footer>
+    </>
   );
 }
