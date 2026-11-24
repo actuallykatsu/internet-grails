@@ -5,6 +5,7 @@ import Logo from './Logo.astro';
 <!--
   Plays once per session. Skippable with any click or key.
   Skipped automatically for reduced-motion visitors and returning tabs.
+  Add ?boot to the URL to play it anyway, for demos.
   The "click to start" moment is also where the media player can be unlocked later.
 -->
 <div id="ig-boot" class="ig-boot" role="dialog" aria-label="Starting Internet Grails" hidden>
@@ -29,7 +30,8 @@ import Logo from './Logo.astro';
     } catch {
       /* storage blocked: just play it */
     }
-    if (reduce || seen) return;
+    const demo = new URLSearchParams(location.search).has('boot');
+    if (!demo && (reduce || seen)) return;
     boot.hidden = false;
 
     const lines = [

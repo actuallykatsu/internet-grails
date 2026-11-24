@@ -20,6 +20,18 @@ test('desktop loads with icons and taskbar', async ({ page, isMobile }) => {
   await expect(page.locator('.ig-phone-status')).toBeVisible({ visible: isMobile });
 });
 
+test('?boot plays the boot screen even for a returning, reduced-motion visitor', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/?boot');
+  const boot = page.getByRole('dialog', { name: 'Starting Internet Grails' });
+  await expect(boot).toBeVisible();
+  await page.keyboard.press('Enter');
+  await expect(boot).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Memes' })).toBeVisible();
+});
+
 test('phone layout: apps fill the screen and back goes home', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'phone layout only');
   await page.goto('/?w=news');
