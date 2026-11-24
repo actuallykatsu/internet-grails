@@ -1,1 +1,23 @@
-{"url":"https://x.com/i/status/2125280721816174650"}
+{
+  "url": "https://x.com/i/status/2125280721816174650",
+  "addedAt": "2026-11-24T18:33:09.946Z",
+  "post": {
+    "text": "",
+    "createdAt": "2026-11-24T17:29:44.000Z",
+    "author": {
+      "name": "internet grails",
+      "handle": "@internetgrails",
+      "avatar": "https://pbs.twimg.com/profile_images/2123529721937838081/tJOn95HI_bigger.jpg"
+    },
+    "likes": 19,
+    "media": [
+      {
+        "type": "video",
+        "src": "https://video.twimg.com/amplify_video/2125280687989121024/vid/avc1/930x720/XRtSZks4sOmNVoUx.mp4",
+        "poster": "https://pbs.twimg.com/amplify_video_thumb/2125280687989121024/img/vLMtgqtinOxyr02H.jpg",
+        "w": 930,
+        "h": 720
+      }
+    ]
+  }
+}
