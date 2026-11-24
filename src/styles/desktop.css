@@ -1,0 +1,290 @@
+/* ---------- Desktop ---------- */
+.ig-desktop {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 70% 30%, rgb(51 225 255 / 0.18), transparent 60%),
+    radial-gradient(ellipse at 20% 90%, rgb(255 62 165 / 0.12), transparent 55%),
+    linear-gradient(160deg, var(--ig-desktop) 0%, var(--ig-desktop-deep) 100%);
+}
+
+.ig-desktop__wordmark {
+  position: absolute;
+  right: 4vw;
+  bottom: calc(var(--ig-taskbar-h) + 4vh);
+  width: min(46vw, 460px);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.ig-icons {
+  list-style: none;
+  margin: 0;
+  padding: 14px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(auto-fill, 92px);
+  gap: 6px;
+  height: calc(100% - var(--ig-taskbar-h));
+  width: max-content;
+}
+
+.ig-icon {
+  width: 86px;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 6px 2px;
+  border: 1px dotted transparent;
+  background: none;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+}
+
+.ig-icon__img {
+  font-size: 34px;
+  line-height: 1;
+  filter: drop-shadow(1px 2px 0 rgb(0 0 0 / 0.35));
+}
+
+.ig-icon__label {
+  font-family: var(--ig-font-chrome);
+  font-size: 18px;
+  line-height: 1;
+  padding: 1px 3px;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.ig-icon[aria-pressed='true'] .ig-icon__label {
+  background: var(--ig-title-active-a);
+  text-shadow: none;
+}
+
+.ig-icon[aria-pressed='true'] {
+  border-color: rgb(255 255 255 / 0.6);
+}
+
+.ig-desk-window {
+  position: absolute;
+  animation: ig-window-in var(--ig-dur) var(--ig-ease);
+}
+
+.ig-desk-window[hidden] {
+  display: none;
+}
+
+@keyframes ig-window-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
+/* File list inside section windows */
+.ig-filelist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ig-filelist a {
+  display: grid;
+  gap: 2px;
+  padding: 8px 6px;
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid #e5e2db;
+}
+
+.ig-filelist a:hover,
+.ig-filelist a:focus-visible {
+  background: #e8efff;
+}
+
+.ig-filelist__title {
+  font-weight: 600;
+}
+
+.ig-filelist__meta {
+  font-family: var(--ig-font-chrome);
+  font-size: 17px;
+  color: var(--ig-ink-soft);
+}
+
+.ig-filelist__summary {
+  font-size: 0.9rem;
+  color: var(--ig-ink-soft);
+}
+
+.ig-contact-card h2 {
+  font-family: var(--ig-font-chrome);
+  font-weight: 400;
+  font-size: 30px;
+  margin: 0;
+}
+
+.ig-contact-card dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 14px;
+}
+
+.ig-contact-card dt {
+  font-weight: 600;
+}
+
+.ig-contact-card dd {
+  margin: 0;
+}
+
+/* ---------- Taskbar ---------- */
+.ig-taskbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9000;
+  height: var(--ig-taskbar-h);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 4px;
+  background: var(--ig-chrome);
+  box-shadow:
+    inset 0 1px 0 var(--ig-chrome-light),
+    inset 0 2px 0 #eeebe5;
+}
+
+.ig-start {
+  position: relative;
+}
+
+.ig-start__btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  height: 32px;
+}
+
+.ig-start__orb {
+  width: 22px;
+  height: 22px;
+}
+
+.ig-start__menu {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  display: flex;
+  min-width: 250px;
+  background: var(--ig-chrome);
+  box-shadow:
+    var(--ig-bevel-out),
+    4px 6px 18px rgb(0 0 0 / 0.3);
+  padding: 3px;
+  animation: ig-window-in var(--ig-dur) var(--ig-ease);
+}
+
+.ig-start__rail {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--ig-font-chrome);
+  font-size: 24px;
+  color: #fff;
+  padding: 8px 4px;
+  background: linear-gradient(0deg, var(--ig-title-active-a), var(--ig-title-active-b));
+}
+
+.ig-start__menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 2px;
+  flex: 1;
+}
+
+.ig-start__menu [role='menuitem'] {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 10px;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 15px;
+  color: var(--ig-ink);
+  text-decoration: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ig-start__menu [role='menuitem']:hover,
+.ig-start__menu [role='menuitem']:focus-visible {
+  background: var(--ig-title-active-a);
+  color: #fff;
+  outline: none;
+}
+
+.ig-taskbar__windows {
+  flex: 1;
+  display: flex;
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ig-taskbar__win {
+  max-width: 180px;
+  min-width: 0;
+  height: 32px;
+  font-size: 17px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+.ig-tray {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 32px;
+  padding: 0 10px;
+  box-shadow: var(--ig-bevel-in);
+}
+
+.ig-tray__contact {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.ig-tray__sound {
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+}
+
+.ig-tray__clock {
+  font-family: var(--ig-font-chrome);
+  font-size: 18px;
+}
+
+/* Narrow screens: placeholder until the retro-phone layout lands (Phase 1). */
+@media (max-width: 860px) {
+  .ig-tray__contact {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .ig-icons {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(auto-fill, minmax(86px, 1fr));
+    grid-template-rows: none;
+    width: auto;
+  }
+}

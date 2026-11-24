@@ -1,0 +1,165 @@
+---
+import { getEntry, render } from 'astro:content';
+import WindowPage from '../../layouts/WindowPage.astro';
+import Embed from '../../components/Embed.astro';
+import TrendList from '../../components/TrendList.astro';
+import MemeGallery from '../../components/MemeGallery';
+import { getPublishedPosts, formatDate, POST_TYPE_LABELS, type Post } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const { data } = post;
+const { Content } = await render(post);
+const author = await getEntry(data.author);
+
+const windowTitle =
+  data.type === 'interview'
+    ? `Now Showing: ${data.title}`
+    : `${POST_TYPE_LABELS[data.type]} - ${data.title}`;
+---
+
+<WindowPage title={data.title} windowTitle={windowTitle} description={data.summary}>
+  <header class="ig-article__head">
+    <p class="ig-article__kicker">{POST_TYPE_LABELS[data.type]}</p>
+    <h1>{data.title}</h1>
+    <p class="ig-article__meta">
+      <time datetime={data.date.toISOString()}>{formatDate(data.date)}</time>
+      {author && <> · by {author.data.name}</>}
+    </p>
+    <p class="ig-article__dek">{data.summary}</p>
+  </header>
+
+  {data.heroImage && <img class="ig-article__hero" src={data.heroImage} alt={data.heroAlt ?? ''} />}
+
+  {data.type === 'interview' && (
+    <section class="ig-nowshowing ig-window" data-active="true">
+      <div class="ig-titlebar">
+        <span class="ig-titlebar__title">Media Player - Now Showing</span>
+      </div>
+      <Embed
+        kind="youtube"
+        url={`https://www.youtube.com/watch?v=${data.youtubeId}`}
+        title={data.title}
+      />
+      {data.highlights.length > 0 && (
+        <ol class="ig-nowshowing__highlights">
+          {data.highlights.map((h) => (
+            <li>
+              <code>{h.time}</code> {h.label}
+            </li>
+          ))}
+        </ol>
+      )}
+    </section>
+  )}
+
+  {data.embeds.map((e) => (
+    <Embed kind={e.kind} url={e.url} caption={e.caption} />
+  ))}
+
+  <Content />
+
+  {data.type === 'trend-roundup' && <TrendList trends={data.trends} />}
+
+  {data.type === 'meme-gallery' && <MemeGallery client:load memes={data.memes} />}
+
+  {data.type === 'music-pick' && (
+    <>
+      {data.spotify && <Embed kind="spotify" url={data.spotify} title={data.title} />}
+      {data.tracks.length > 0 && (
+        <ol>
+          {data.tracks.map((t) => (
+            <li>
+              {t.artist}: {t.title}
+            </li>
+          ))}
+        </ol>
+      )}
+    </>
+  )}
+
+  {data.type === 'daily-roundup' && (
+    <ol class="ig-roundup">
+      {data.items.map((item) => (
+        <li>
+          <strong>{item.url ? <a href={item.url}>{item.headline}</a> : item.headline}</strong>
+          <p>{item.blurb}</p>
+        </li>
+      ))}
+    </ol>
+  )}
+
+  {data.credits.length > 0 && (
+    <footer class="ig-article__credits">
+      <h2>Sources &amp; credits</h2>
+      <ul>
+        {data.credits.map((c) => (
+          <li>{c.url ? <a href={c.url}>{c.name}</a> : c.name}</li>
+        ))}
+      </ul>
+    </footer>
+  )}
+</WindowPage>
+
+<style>
+  .ig-article__kicker {
+    font-family: var(--ig-font-chrome);
+    font-size: 20px;
+    color: var(--ig-accent);
+    margin: 0;
+  }
+  .ig-article__head h1 {
+    margin: 0.2rem 0 0.4rem;
+  }
+  .ig-article__meta {
+    color: var(--ig-ink-soft);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+  .ig-article__dek {
+    font-size: 1.15rem;
+    color: var(--ig-ink-soft);
+  }
+  .ig-article__hero {
+    width: 100%;
+    box-shadow: var(--ig-bevel-in);
+  }
+  .ig-nowshowing {
+    margin: 1.5rem 0;
+  }
+  .ig-nowshowing :global(.ig-embed) {
+    margin: 3px 0 0;
+  }
+  .ig-nowshowing__highlights {
+    background: #111;
+    color: #9ff7a8;
+    margin: 0;
+    padding: 10px 10px 10px 32px;
+    font-size: 0.9rem;
+  }
+  .ig-nowshowing__highlights code {
+    color: var(--ig-accent-2);
+  }
+  .ig-roundup li {
+    margin-bottom: 0.8rem;
+  }
+  .ig-roundup p {
+    margin: 0.2rem 0 0;
+  }
+  .ig-article__credits {
+    margin-top: 3rem;
+    border-top: 1px dashed var(--ig-chrome-mid);
+    font-size: 0.9rem;
+  }
+  .ig-article__credits h2 {
+    font-size: 1.4rem;
+  }
+</style>

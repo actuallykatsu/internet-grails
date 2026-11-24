@@ -1,0 +1,146 @@
+---
+/** Trend roundup as a Buddy List: Online = rising, Away = peaking, Signed off = dead. */
+import Embed from './Embed.astro';
+
+interface Trend {
+  name: string;
+  status: 'online' | 'away' | 'signed-off';
+  heat: number;
+  explainer: string;
+  example?: { kind: 'youtube' | 'spotify' | 'soundcloud' | 'tiktok' | 'x'; url: string };
+}
+interface Props {
+  trends: Trend[];
+}
+const { trends } = Astro.props;
+
+const groups = [
+  { status: 'online', label: 'Online (rising)' },
+  { status: 'away', label: 'Away (peaking)' },
+  { status: 'signed-off', label: 'Signed off (dead)' },
+] as const;
+
+const ranked = trends.map((t, i) => ({ ...t, rank: i + 1 }));
+---
+
+<div class="ig-buddy ig-window" data-active="true">
+  <div class="ig-titlebar">
+    <span class="ig-titlebar__title">Trend Buddy List</span>
+  </div>
+  <div class="ig-buddy__body">
+    {groups.map((g) => {
+      const items = ranked.filter((t) => t.status === g.status);
+      if (!items.length) return null;
+      return (
+        <details open class={`ig-buddy__group ig-buddy__group--${g.status}`}>
+          <summary>
+            {g.label} ({items.length}/{trends.length})
+          </summary>
+          <ol>
+            {items.map((t) => (
+              <li class="ig-buddy__item">
+                <span class={`ig-buddy__dot ig-buddy__dot--${t.status}`} aria-hidden="true" />
+                <span class="ig-buddy__rank">#{t.rank}</span>
+                <span class="ig-buddy__name">{t.name}</span>
+                <span
+                  class="ig-buddy__heat"
+                  role="meter"
+                  aria-label="Heat"
+                  aria-valuemin="1"
+                  aria-valuemax="5"
+                  aria-valuenow={t.heat}
+                >
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <i class={n <= t.heat ? 'on' : ''} style={`height:${n * 3 + 2}px`} />
+                  ))}
+                </span>
+                <p class="ig-buddy__away">{t.explainer}</p>
+                {t.example && <Embed kind={t.example.kind} url={t.example.url} />}
+              </li>
+            ))}
+          </ol>
+        </details>
+      );
+    })}
+  </div>
+</div>
+
+<style>
+  .ig-buddy {
+    max-width: 420px;
+    margin: 1.5rem auto;
+  }
+  .ig-buddy__body {
+    background: #fff;
+    box-shadow: var(--ig-bevel-in);
+    margin-top: 3px;
+    padding: 6px 4px;
+    font-size: 0.95rem;
+  }
+  .ig-buddy__group summary {
+    font-weight: 700;
+    cursor: pointer;
+    padding: 2px 4px;
+  }
+  .ig-buddy__group--signed-off {
+    color: var(--ig-offline);
+  }
+  .ig-buddy ol {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 6px 14px;
+  }
+  .ig-buddy__item {
+    display: grid;
+    grid-template-columns: 14px 32px 1fr auto;
+    align-items: center;
+    gap: 4px 6px;
+    padding: 4px 2px;
+  }
+  .ig-buddy__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid rgb(0 0 0 / 0.4);
+  }
+  .ig-buddy__dot--online {
+    background: var(--ig-online);
+  }
+  .ig-buddy__dot--away {
+    background: var(--ig-away);
+  }
+  .ig-buddy__dot--signed-off {
+    background: var(--ig-offline);
+  }
+  .ig-buddy__rank {
+    font-family: var(--ig-font-chrome);
+    font-size: 18px;
+    color: var(--ig-ink-soft);
+  }
+  .ig-buddy__name {
+    font-weight: 600;
+  }
+  .ig-buddy__heat {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 18px;
+  }
+  .ig-buddy__heat i {
+    width: 4px;
+    background: #d6d3cc;
+  }
+  .ig-buddy__heat i.on {
+    background: var(--ig-accent);
+  }
+  .ig-buddy__away {
+    grid-column: 3 / -1;
+    margin: 0;
+    font-style: italic;
+    color: var(--ig-ink-soft);
+    font-size: 0.88rem;
+  }
+  .ig-buddy__item :global(.ig-embed) {
+    grid-column: 1 / -1;
+  }
+</style>

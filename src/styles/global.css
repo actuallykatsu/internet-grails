@@ -1,0 +1,251 @@
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--ig-font-body);
+  color: var(--ig-ink);
+  background: var(--ig-desktop);
+  line-height: 1.55;
+}
+
+a {
+  color: #1a4fd0;
+}
+
+:focus-visible {
+  outline: 2px dotted var(--ig-ink);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Window chrome ---------- */
+.ig-window {
+  background: var(--ig-chrome);
+  box-shadow:
+    var(--ig-bevel-out),
+    4px 6px 24px rgb(0 0 0 / 0.35);
+  padding: 3px;
+  display: flex;
+  flex-direction: column;
+  min-width: 260px;
+}
+
+.ig-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 4px 0 6px;
+  color: #fff;
+  font-family: var(--ig-font-chrome);
+  font-size: 20px;
+  letter-spacing: 0.02em;
+  background: linear-gradient(90deg, var(--ig-title-active-a), var(--ig-title-active-b));
+  user-select: none;
+}
+
+.ig-window[data-active='false'] .ig-titlebar {
+  background: linear-gradient(90deg, var(--ig-title-inactive-a), var(--ig-title-inactive-b));
+}
+
+.ig-titlebar__title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ig-titlebar__btn {
+  width: 22px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: var(--ig-chrome);
+  box-shadow: var(--ig-bevel-out);
+  font-family: var(--ig-font-chrome);
+  font-size: 18px;
+  line-height: 1;
+  color: var(--ig-ink);
+  cursor: pointer;
+}
+
+.ig-titlebar__btn:active {
+  box-shadow: var(--ig-bevel-in);
+}
+
+.ig-window__body {
+  flex: 1;
+  overflow: auto;
+  background: var(--ig-paper);
+  box-shadow: var(--ig-bevel-in);
+  margin-top: 3px;
+  padding: 12px 14px;
+}
+
+/* ---------- Buttons ---------- */
+.ig-btn {
+  font-family: var(--ig-font-chrome);
+  font-size: 20px;
+  padding: 4px 14px;
+  border: 0;
+  background: var(--ig-chrome);
+  box-shadow: var(--ig-bevel-out);
+  color: var(--ig-ink);
+  cursor: pointer;
+}
+
+.ig-btn:active,
+.ig-btn[aria-pressed='true'] {
+  box-shadow: var(--ig-bevel-in);
+}
+
+.ig-btn--aqua {
+  border-radius: 999px;
+  color: #06264f;
+  background: linear-gradient(180deg, #e8f4ff 0%, #8cc4ff 50%, #4a9bf2 51%, #a8dcff 100%);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 1px 2px rgb(0 0 0 / 0.4);
+}
+
+/* ---------- Article typography ---------- */
+.ig-prose {
+  max-width: 68ch;
+  margin: 0 auto;
+  font-size: 1.0625rem;
+}
+
+.ig-prose h1,
+.ig-prose h2,
+.ig-prose h3 {
+  font-family: var(--ig-font-chrome);
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.ig-prose h1 {
+  font-size: 2.6rem;
+}
+
+.ig-prose h2 {
+  font-size: 1.9rem;
+  margin-top: 2rem;
+}
+
+.ig-prose img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ---------- Official contact strip ---------- */
+.ig-contact-strip {
+  font-family: var(--ig-font-chrome);
+  font-size: 18px;
+  color: var(--ig-ink);
+}
+
+.ig-contact-strip a {
+  color: inherit;
+}
+
+/* ---------- Meme gallery + image viewer ---------- */
+.ig-gallery__grid {
+  list-style: none;
+  margin: 1.5rem 0;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+  background: #fff;
+  box-shadow: var(--ig-bevel-in);
+}
+
+.ig-gallery__grid button {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: 4px;
+  border: 1px dotted transparent;
+  background: none;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.ig-gallery__grid button:hover,
+.ig-gallery__grid button:focus-visible {
+  border-color: var(--ig-title-active-a);
+  background: #e8efff;
+}
+
+.ig-gallery__grid img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border: 1px solid var(--ig-chrome-mid);
+}
+
+.ig-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 9500;
+  display: grid;
+  place-items: center;
+  background: rgb(0 0 0 / 0.55);
+  padding: 16px;
+}
+
+.ig-viewer .ig-window {
+  width: min(720px, 100%);
+  animation: ig-window-in var(--ig-dur) var(--ig-ease);
+}
+
+.ig-viewer__stage {
+  background: #222;
+  display: grid;
+  place-items: center;
+  margin-top: 3px;
+  max-height: 70vh;
+}
+
+.ig-viewer__stage img {
+  max-width: 100%;
+  max-height: 70vh;
+}
+
+.ig-viewer__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 2px 2px;
+  font-size: 0.9rem;
+}
+
+.ig-viewer__bar p {
+  margin: 0;
+  text-align: center;
+}

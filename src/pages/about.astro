@@ -1,0 +1,33 @@
+---
+import WindowPage from '../layouts/WindowPage.astro';
+import { SITE } from '../lib/site';
+---
+
+<WindowPage title="About" windowTitle="About - Internet Grails" description={SITE.tagline}>
+  <h1>About {SITE.name}</h1>
+  <p>
+    <strong>{SITE.name}</strong> is a daily hub for internet culture: memes, music, trends and news,
+    served on a desktop that never left 1999.
+  </p>
+
+  <!-- TODO: replace with the real story: who runs it, what it covers, when it started. -->
+  <h2>Who runs it</h2>
+  <p>Placeholder: a short line about the founder(s).</p>
+
+  <h2>What we cover</h2>
+  <ul>
+    <li>News on what's happening across internet culture</li>
+    <li>Credited meme drops</li>
+    <li>Music picks and playlists</li>
+    <li>Trend roundups: what's rising and what's dying</li>
+    <li>Interviews worth your time</li>
+  </ul>
+
+  <h2>Since</h2>
+  <p>Started in {SITE.founded}.</p>
+
+  <p>
+    Business &amp; press: <a href={`mailto:${SITE.email}`}>{SITE.email}</a> · Official X:{' '}
+    <a href={SITE.x.url}>{SITE.x.handle}</a> · <a href="/contact/">Contact page</a>
+  </p>
+</WindowPage>

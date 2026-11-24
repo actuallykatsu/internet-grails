@@ -1,0 +1,38 @@
+---
+/** Phase 0 mockup: the trend roundup in its Buddy List window, on the desktop. */
+import { getEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import TrendList from '../../components/TrendList.astro';
+
+const sample = await getEntry('posts', 'sample-trend-roundup');
+if (!sample || sample.data.type !== 'trend-roundup') {
+  throw new Error('Mockup needs src/content/posts/sample-trend-roundup.md');
+}
+---
+
+<Base title="Mockup: Trend roundup" index={false}>
+  <main class="ig-mockup">
+    <p class="ig-mockup__note">
+      Phase 0 mockup · <a href="/">back to desktop</a> ·{' '}
+      <a href={`/posts/${sample.id}/`}>see it in the article template</a>
+    </p>
+    <TrendList trends={sample.data.trends} />
+  </main>
+</Base>
+
+<style>
+  .ig-mockup {
+    min-height: 100vh;
+    padding: 24px 16px;
+    background: linear-gradient(160deg, var(--ig-desktop) 0%, var(--ig-desktop-deep) 100%);
+  }
+  .ig-mockup__note {
+    color: #fff;
+    text-align: center;
+    font-family: var(--ig-font-chrome);
+    font-size: 20px;
+  }
+  .ig-mockup__note a {
+    color: var(--ig-accent-2);
+  }
+</style>

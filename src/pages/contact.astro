@@ -1,0 +1,93 @@
+---
+import WindowPage from '../layouts/WindowPage.astro';
+import { SITE } from '../lib/site';
+---
+
+<WindowPage
+  title="Contact"
+  windowTitle="Contact - Internet Grails"
+  description={`Official contact for ${SITE.name}: ${SITE.email}, X ${SITE.x.handle}.`}
+>
+  <h1>Contact {SITE.name}</h1>
+  <p>
+    <strong>Business &amp; press inquiries</strong> are welcome. Here's how to reach us officially.
+  </p>
+
+  <dl class="ig-official">
+    <dt>Business name</dt>
+    <dd>{SITE.name}</dd>
+    <dt>Email</dt>
+    <dd>
+      <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+    </dd>
+    <dt>X (official)</dt>
+    <dd>
+      <a href={SITE.x.url}>{SITE.x.handle}</a>
+    </dd>
+    <dt>TikTok (official)</dt>
+    <dd>{SITE.tiktok ? <a href={SITE.tiktok.url}>{SITE.tiktok.handle}</a> : 'Coming soon'}</dd>
+    <dt>Website</dt>
+    <dd>
+      <a href={SITE.url}>internetgrails.com</a>
+    </dd>
+  </dl>
+
+  <h2>Send a message</h2>
+  <!--
+    TODO (Phase 1): wire to a form backend that delivers to marketing@internetgrails.com
+    (e.g. a Cloudflare/Vercel function or a forms service) with Turnstile.
+    Until then the form opens the visitor's email app.
+  -->
+  <form class="ig-form" action={`mailto:${SITE.email}`} method="post" enctype="text/plain">
+    <label>
+      Name <input name="name" autocomplete="name" required />
+    </label>
+    <label>
+      Email <input name="email" type="email" autocomplete="email" required />
+    </label>
+    <label>
+      Message <textarea name="message" rows="6" required></textarea>
+    </label>
+    <button class="ig-btn" type="submit">
+      Send
+    </button>
+  </form>
+</WindowPage>
+
+<style>
+  .ig-official {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 6px 20px;
+    padding: 14px 16px;
+    background: #fff;
+    box-shadow: var(--ig-bevel-in);
+  }
+  .ig-official dt {
+    font-weight: 700;
+  }
+  .ig-official dd {
+    margin: 0;
+  }
+  .ig-form {
+    display: grid;
+    gap: 12px;
+    max-width: 460px;
+  }
+  .ig-form label {
+    display: grid;
+    gap: 4px;
+    font-weight: 600;
+  }
+  .ig-form input,
+  .ig-form textarea {
+    font: inherit;
+    padding: 6px 8px;
+    border: 0;
+    background: #fff;
+    box-shadow: var(--ig-bevel-in);
+  }
+  .ig-form button {
+    justify-self: start;
+  }
+</style>

@@ -1,0 +1,35 @@
+---
+import Base from '../layouts/Base.astro';
+import BootScreen from '../components/BootScreen.astro';
+import Logo from '../components/Logo.astro';
+import Desktop from '../components/desktop/Desktop';
+import { getPublishedPosts, toSummary } from '../lib/posts';
+import { SITE } from '../lib/site';
+
+const posts = (await getPublishedPosts()).map(toSummary);
+---
+
+<Base>
+  <h1 class="sr-only">{SITE.name}</h1>
+  <BootScreen />
+  <Desktop client:load posts={posts}>
+    <Logo size="full" />
+  </Desktop>
+
+  <!-- Plain links for crawlers, screen readers and no-JS visitors. -->
+  <nav class="sr-only" aria-label="Site">
+    <ul>
+      <li>
+        <a href="/about/">About Internet Grails</a>
+      </li>
+      <li>
+        <a href="/contact/">Contact</a>
+      </li>
+      {posts.map((p) => (
+        <li>
+          <a href={`/posts/${p.slug}/`}>{p.title}</a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</Base>

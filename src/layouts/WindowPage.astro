@@ -1,0 +1,70 @@
+---
+/**
+ * A real, linkable page that renders as a maximized window on the desktop,
+ * so articles, Contact and About read like normal pages but wear the chrome.
+ */
+import Base from './Base.astro';
+import Taskbar from '../components/desktop/Taskbar';
+import { SECTIONS } from '../lib/site';
+
+interface Props {
+  title: string;
+  windowTitle?: string;
+  description?: string;
+  index?: boolean;
+}
+
+const { title, windowTitle = title, description, index } = Astro.props;
+
+const startItems = [
+  { label: 'Desktop', icon: '🖥️', href: '/' },
+  ...SECTIONS.map(({ id, label, icon }) => ({ label, icon, href: `/?w=${id}` })),
+  { label: 'Contact', icon: '📇', href: '/contact/' },
+  { label: 'About', icon: 'ℹ️', href: '/about/' },
+];
+---
+
+<Base title={title} description={description} index={index}>
+  <div class="ig-page">
+    <article class="ig-window ig-page__window" data-active="true">
+      <div class="ig-titlebar">
+        <span class="ig-titlebar__title">{windowTitle}</span>
+        <a class="ig-titlebar__btn" href="/" aria-label="Minimize to desktop">
+          _
+        </a>
+        <a class="ig-titlebar__btn" href="/" aria-label="Close and return to desktop">
+          ×
+        </a>
+      </div>
+      <div class="ig-window__body">
+        <main class="ig-prose">
+          <slot />
+        </main>
+      </div>
+    </article>
+  </div>
+  <Taskbar client:idle startItems={startItems} />
+</Base>
+
+<style>
+  .ig-page {
+    min-height: 100vh;
+    padding: 0 0 var(--ig-taskbar-h);
+    background: linear-gradient(160deg, var(--ig-desktop) 0%, var(--ig-desktop-deep) 100%);
+  }
+  .ig-page__window {
+    min-height: calc(100vh - var(--ig-taskbar-h));
+    animation: ig-window-in var(--ig-dur) var(--ig-ease);
+  }
+  .ig-page__window .ig-titlebar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  .ig-titlebar__btn {
+    text-decoration: none;
+  }
+  .ig-window__body {
+    padding: clamp(16px, 4vw, 48px) clamp(14px, 4vw, 32px);
+  }
+</style>

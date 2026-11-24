@@ -1,0 +1,167 @@
+import { useCallback, useState, type ReactNode } from 'react';
+import Window from './Window';
+import Taskbar, { type StartItem } from './Taskbar';
+import { useWindowManager, type WinSpec } from './useWindowManager';
+import { SECTIONS, SITE } from '../../lib/site';
+import type { PostSummary } from '../../lib/posts';
+
+interface Props {
+  posts: PostSummary[];
+  /** Static wordmark passed in from Astro. */
+  children?: ReactNode;
+}
+
+const EXTRA_ICONS = [
+  { id: 'contact', label: 'Contact', icon: '📇' },
+  { id: 'about', label: 'About', icon: 'ℹ️' },
+] as const;
+
+const ICONS = [...SECTIONS.map(({ id, label, icon }) => ({ id, label, icon })), ...EXTRA_ICONS];
+
+const START_ITEMS: StartItem[] = [
+  ...ICONS.map(({ id, label, icon }) => ({ label, icon, windowId: id })),
+  { label: 'Trend roundup mockup', icon: '🧪', href: '/mockups/trend-roundup' },
+];
+
+function postsFor(sectionId: string, posts: PostSummary[]) {
+  const section = SECTIONS.find((s) => s.id === sectionId);
+  if (!section) return [];
+  if (section.types === 'all') return posts;
+  return posts.filter((p) => (section.types as readonly string[]).includes(p.type));
+}
+
+function SectionWindowBody({ posts }: { posts: PostSummary[] }) {
+  if (!posts.length) return <p>Nothing here yet. Check back tomorrow.</p>;
+  return (
+    <ul className="ig-filelist">
+      {posts.map((p) => (
+        <li key={p.slug}>
+          <a href={`/posts/${p.slug}/`}>
+            <span className="ig-filelist__title">{p.title}</span>
+            <span className="ig-filelist__meta">
+              {p.typeLabel} · {p.date}
+            </span>
+            <span className="ig-filelist__summary">{p.summary}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function ContactBody() {
+  return (
+    <div className="ig-contact-card">
+      <h2>{SITE.name}</h2>
+      <p>Business &amp; press inquiries</p>
+      <dl>
+        <dt>Email</dt>
+        <dd>
+          <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+        </dd>
+        <dt>X</dt>
+        <dd>
+          <a href={SITE.x.url}>{SITE.x.handle}</a>
+        </dd>
+        <dt>TikTok</dt>
+        <dd>{SITE.tiktok ? <a href={SITE.tiktok.url}>{SITE.tiktok.handle}</a> : 'Coming soon'}</dd>
+      </dl>
+      <p>
+        <a href="/contact/">Open the full Contact page →</a>
+      </p>
+    </div>
+  );
+}
+
+function AboutBody() {
+  return (
+    <div>
+      <p>
+        <strong>{SITE.name}</strong> is a daily hub for internet culture: memes, music, trends and
+        news, served on a desktop that never left 1999.
+      </p>
+      <p>
+        <a href="/about/">Read the full About page →</a>
+      </p>
+    </div>
+  );
+}
+
+export default function Desktop({ posts, children }: Props) {
+  const [selected, setSelected] = useState<string | null>(null);
+
+  const resolve = useCallback((id: string): WinSpec | undefined => {
+    const icon = ICONS.find((i) => i.id === id);
+    if (!icon) return undefined;
+    if (id === 'contact') return { id, title: 'Contact', w: 420, h: 380 };
+    if (id === 'about') return { id, title: 'About', w: 420, h: 260 };
+    return { id, title: `C:\\Grails\\${icon.label}`, w: 560, h: 440 };
+  }, []);
+
+  const wm = useWindowManager(resolve);
+
+  const renderBody = (id: string) => {
+    if (id === 'contact') return <ContactBody />;
+    if (id === 'about') return <AboutBody />;
+    return <SectionWindowBody posts={postsFor(id, posts)} />;
+  };
+
+  return (
+    <div className="ig-desktop">
+      <div className="ig-desktop__wordmark" aria-hidden="true">
+        {children}
+      </div>
+      <ul className="ig-icons" aria-label="Desktop">
+        {ICONS.map((icon) => (
+          <li key={icon.id}>
+            <button
+              type="button"
+              className="ig-icon"
+              aria-pressed={selected === icon.id}
+              onClick={(e) => {
+                setSelected(icon.id);
+                // Single tap opens on touch; mouse uses double-click like the real thing.
+                if ((e.nativeEvent as PointerEvent).pointerType === 'touch') wm.open(icon.id);
+              }}
+              onDoubleClick={() => wm.open(icon.id)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  wm.open(icon.id);
+                }
+              }}
+            >
+              <span className="ig-icon__img" aria-hidden="true">
+                {icon.icon}
+              </span>
+              <span className="ig-icon__label">{icon.label}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      {wm.wins.map((win, i) => (
+        <Window
+          key={win.id}
+          win={win}
+          z={10 + i}
+          active={wm.activeId === win.id}
+          onFocus={() => wm.focus(win.id)}
+          onClose={() => wm.close(win.id)}
+          onMinimize={() => wm.minimize(win.id)}
+          onToggleMax={() => wm.toggleMax(win.id)}
+          onMove={(x, y) => wm.moveTo(win.id, x, y)}
+        >
+          {renderBody(win.id)}
+        </Window>
+      ))}
+
+      <Taskbar
+        startItems={START_ITEMS}
+        windows={wm.wins.map((w) => ({ id: w.id, title: w.title, active: wm.activeId === w.id }))}
+        onStartItem={(item) => item.windowId && wm.open(item.windowId)}
+        onWindowButton={wm.taskbarToggle}
+      />
+    </div>
+  );
+}

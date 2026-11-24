@@ -1,0 +1,421 @@
+---
+/**
+ * Internet Grails logo, traced from nostalgia_logo_v1.png (see scripts/trace-logo.mjs).
+ *
+ * full: the whole wordmark. Black outlines, chrome fill, a shine that sweeps across
+ *       the letters and twinkling sparkles.
+ *       variant 'globe': a real orthographic globe spins inside the rings, with the
+ *       orbit band and "ls" redrawn in front of it (first frame rendered at build).
+ *       variant 'classic': the flat trace with a glint drifting over the globe.
+ *       The default comes from LOGO_VARIANT in src/lib/site.ts.
+ * mark: the compact globe-and-crown mark (favicon, Start button, app icon).
+ */
+import { LOGO_VARIANT } from '../lib/site';
+import { globeFrame, START_LON, TURN_SECONDS } from './logo/globe';
+import {
+  FG_INK,
+  FG_LIGHT,
+  GLOBE,
+  LIGHT,
+  LOGO_HEIGHT,
+  LOGO_WIDTH,
+  SILHOUETTE,
+  STARS,
+} from './logo/paths';
+
+interface Props {
+  size?: 'full' | 'mark';
+  variant?: 'globe' | 'classic';
+  class?: string;
+}
+const { size = 'full', variant = LOGO_VARIANT, class: className } = Astro.props;
+const globe = size === 'full' && variant === 'globe';
+const first = globe ? globeFrame(START_LON) : null;
+
+// Unique ids: the logo appears more than once per page, and a hidden copy's
+// defs would otherwise blank out the visible one.
+const uid = Math.random().toString(36).slice(2, 8);
+const metal = `ig-metal-${uid}`;
+const shine = `ig-shine-${uid}`;
+const glint = `ig-glint-${uid}`;
+const clip = `ig-clip-${uid}`;
+const shineMask = `ig-shinemask-${uid}`;
+const disc = `ig-disc-${uid}`;
+const ocean = `ig-ocean-${uid}`;
+const landMetal = `ig-land-${uid}`;
+const shade = `ig-shade-${uid}`;
+const atmo = `ig-atmo-${uid}`;
+---
+
+{size === 'full' ? (
+  <svg
+    class:list={['ig-logo', 'ig-logo--full', globe && 'ig-logo--globe', className]}
+    viewBox={`0 0 ${LOGO_WIDTH} ${LOGO_HEIGHT}`}
+    width="420"
+    role="img"
+    aria-label="Internet Grails"
+  >
+    <defs>
+      {/* Chrome: reflected per text line so both rows get their own horizon. */}
+      <linearGradient
+        id={metal}
+        gradientUnits="userSpaceOnUse"
+        x1="0"
+        y1="200"
+        x2="0"
+        y2="380"
+        spreadMethod="reflect"
+      >
+        <stop offset="0" stop-color="#ffffff" />
+        <stop offset="0.3" stop-color="#d9dee6" />
+        <stop offset="0.49" stop-color="#7d8592" />
+        <stop offset="0.53" stop-color="#f4f6f9" />
+        <stop offset="0.8" stop-color="#b3bbc6" />
+        <stop offset="1" stop-color="#ffffff" />
+      </linearGradient>
+      <linearGradient id={shine} x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#fff" stop-opacity="0" />
+        <stop offset="0.5" stop-color="#fff" stop-opacity="0.95" />
+        <stop offset="1" stop-color="#fff" stop-opacity="0" />
+      </linearGradient>
+      <radialGradient id={glint}>
+        <stop offset="0" stop-color="#ffffff" stop-opacity="0.9" />
+        <stop offset="1" stop-color="#ffffff" stop-opacity="0" />
+      </radialGradient>
+      <clipPath id={clip}>
+        <path d={LIGHT} clip-rule="evenodd" />
+      </clipPath>
+      {globe && (
+        <>
+          <clipPath id={disc}>
+            <circle cx={GLOBE.cx} cy={GLOBE.cy} r={GLOBE.r} />
+          </clipPath>
+          {/* Shine follows the chrome, but not the flat continents under the new globe. */}
+          <mask
+            id={shineMask}
+            maskUnits="userSpaceOnUse"
+            x="0"
+            y="0"
+            width={LOGO_WIDTH}
+            height={LOGO_HEIGHT}
+          >
+            <path d={LIGHT} fill="#fff" fill-rule="evenodd" />
+            <circle cx={GLOBE.cx} cy={GLOBE.cy} r={GLOBE.r + 2} fill="#000" />
+            <path d={FG_LIGHT} fill="#fff" fill-rule="evenodd" />
+          </mask>
+          {/* Continents: chrome lit from the upper left, with a horizon band. */}
+          <linearGradient
+            id={landMetal}
+            gradientUnits="userSpaceOnUse"
+            x1={GLOBE.cx - 170}
+            y1={GLOBE.cy - 230}
+            x2={GLOBE.cx + 150}
+            y2={GLOBE.cy + 230}
+          >
+            <stop offset="0" stop-color="#ffffff" />
+            <stop offset="0.42" stop-color="#e6ebf0" />
+            <stop offset="0.5" stop-color="#9aa3af" />
+            <stop offset="0.56" stop-color="#f4f6f9" />
+            <stop offset="1" stop-color="#b6bec9" />
+          </linearGradient>
+          <radialGradient id={ocean} cx="0.36" cy="0.3" r="0.8">
+            <stop offset="0" stop-color="#2a8fa6" />
+            <stop offset="0.45" stop-color="#0e4257" />
+            <stop offset="1" stop-color="#03141d" />
+          </radialGradient>
+          {/* Night side: light from the upper left. */}
+          <radialGradient id={shade} cx="0.3" cy="0.25" r="0.95">
+            <stop offset="0.55" stop-color="#000" stop-opacity="0" />
+            <stop offset="0.9" stop-color="#000" stop-opacity="0.3" />
+            <stop offset="1" stop-color="#000" stop-opacity="0.55" />
+          </radialGradient>
+          <radialGradient id={atmo}>
+            <stop offset="0.9" stop-color="#33e1ff" stop-opacity="0" />
+            <stop offset="0.98" stop-color="#7cf0ff" stop-opacity="0.5" />
+            <stop offset="1" stop-color="#b8f8ff" stop-opacity="0.75" />
+          </radialGradient>
+        </>
+      )}
+    </defs>
+
+    {/* Traced paths encode letter holes as inner subpaths: they need evenodd. */}
+    <path d={SILHOUETTE} fill="#141414" fill-rule="evenodd" />
+    <path d={LIGHT} fill={`url(#${metal})`} fill-rule="evenodd" />
+
+    {globe && first && (
+      <>
+        <g
+          class="ig-globe"
+          clip-path={`url(#${disc})`}
+          data-ig-globe
+          data-start={START_LON}
+          data-turn={TURN_SECONDS}
+        >
+          <circle cx={GLOBE.cx} cy={GLOBE.cy} r={GLOBE.r} fill={`url(#${ocean})`} />
+          {/* Far side, seen through the glass: a faint hologram. */}
+          <path
+            class="ig-globe__grid-back"
+            d={first.gridBack}
+            fill="none"
+            stroke="#33e1ff"
+            stroke-opacity="0.14"
+            stroke-width="2"
+          />
+          <path class="ig-globe__land-back" d={first.landBack} fill="#33e1ff" fill-opacity="0.16" />
+          <path
+            class="ig-globe__grid"
+            d={first.grid}
+            fill="none"
+            stroke="#7cf0ff"
+            stroke-opacity="0.38"
+            stroke-width="2.5"
+          />
+          <path
+            class="ig-globe__land"
+            d={first.land}
+            fill={`url(#${landMetal})`}
+            stroke="#141414"
+            stroke-width="6"
+            stroke-linejoin="round"
+          />
+          <circle cx={GLOBE.cx} cy={GLOBE.cy} r={GLOBE.r} fill={`url(#${shade})`} />
+          <ellipse
+            class="ig-globe__spec"
+            cx={GLOBE.cx - 95}
+            cy={GLOBE.cy - 120}
+            rx="90"
+            ry="52"
+            fill={`url(#${glint})`}
+            transform={`rotate(-30 ${GLOBE.cx - 95} ${GLOBE.cy - 120})`}
+          />
+          <circle cx={GLOBE.cx} cy={GLOBE.cy} r={GLOBE.r} fill={`url(#${atmo})`} />
+        </g>
+        {/*
+          No stroke around the globe: the artwork's own inner ring (r 239–250) sits
+          under its edge. The front pieces below are traced out to r 256 (FG_LIMIT in
+          the trace script) so the "l", "s" and "t" fully cover the globe's edge.
+        */}
+        {/* Orbit band and "ls" pass in front of the globe. */}
+        <path d={FG_INK} fill="#141414" fill-rule="evenodd" />
+        <path d={FG_LIGHT} fill={`url(#${metal})`} fill-rule="evenodd" />
+      </>
+    )}
+
+    <g
+      clip-path={globe ? undefined : `url(#${clip})`}
+      mask={globe ? `url(#${shineMask})` : undefined}
+    >
+      <rect
+        class="ig-logo__shine"
+        x="-420"
+        y="0"
+        width="360"
+        height={LOGO_HEIGHT}
+        fill={`url(#${shine})`}
+        transform="skewX(-20)"
+      />
+      {!globe && (
+        <ellipse
+          class="ig-logo__glint"
+          cx="1700"
+          cy="250"
+          rx="150"
+          ry="110"
+          fill={`url(#${glint})`}
+        />
+      )}
+    </g>
+
+    {STARS.map((s, i) => (
+      <path
+        class="ig-logo__star"
+        d={s.d}
+        fill="#ffffff"
+        style={`transform-origin:${s.cx}px ${s.cy}px;animation-delay:${(i * 0.55).toFixed(2)}s`}
+      />
+    ))}
+  </svg>
+) : (
+  <svg
+    class:list={['ig-logo', 'ig-logo--mark', className]}
+    viewBox="0 0 64 64"
+    width="64"
+    role="img"
+    aria-label="Internet Grails"
+  >
+    <defs>
+      <linearGradient id={metal} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ffffff" />
+        <stop offset="0.48" stop-color="#8a929e" />
+        <stop offset="0.53" stop-color="#f4f6f9" />
+        <stop offset="1" stop-color="#b3bbc6" />
+      </linearGradient>
+    </defs>
+    <g stroke="#141414" stroke-linejoin="round">
+      <circle cx="32" cy="38" r="20" fill={`url(#${metal})`} stroke-width="3.5" />
+      <path
+        d="M20 30c4-3 9-3 11 1s-2 6 1 9 7 1 8 5M38 22c2 3 6 3 8 6"
+        fill="none"
+        stroke-width="2"
+      />
+      <ellipse
+        cx="32"
+        cy="40"
+        rx="29"
+        ry="8"
+        fill="none"
+        stroke-width="3.5"
+        transform="rotate(-16 32 40)"
+      />
+      <path d="M21 17l3-11 8 7 8-7 3 11z" fill="#ffffff" stroke-width="2.5" />
+      <circle cx="24" cy="5.5" r="2.4" fill="#ffffff" stroke-width="1.8" />
+      <circle cx="32" cy="11" r="2.4" fill="#ffffff" stroke-width="1.8" />
+      <circle cx="40" cy="5.5" r="2.4" fill="#ffffff" stroke-width="1.8" />
+    </g>
+  </svg>
+)}
+
+<script>
+  import { globeFrame, REDUCED_TURN_SECONDS } from './logo/globe';
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const FRAME_MS = 1000 / 40; // the globe is small; 40fps keeps it smooth and cheap
+  const SLOW_FRAME_MS = 1000 / 20; // the slow spin moves under half a degree per frame
+
+  function spin(g: SVGGElement) {
+    const svg = g.ownerSVGElement;
+    if (!svg) return;
+    const parts = {
+      land: g.querySelector('.ig-globe__land'),
+      landBack: g.querySelector('.ig-globe__land-back'),
+      grid: g.querySelector('.ig-globe__grid'),
+      gridBack: g.querySelector('.ig-globe__grid-back'),
+    };
+    const fullSpeed = 360 / (Number(g.dataset.turn) * 1000);
+    const slowSpeed = 360 / (REDUCED_TURN_SECONDS * 1000);
+    let lon = Number(g.dataset.start);
+    let visible = false;
+    let raf = 0;
+    let last = 0;
+    let drawn = 0;
+
+    const io = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      wake();
+    });
+    const stop = () => {
+      io.disconnect();
+      document.removeEventListener('visibilitychange', wake);
+      reduce.removeEventListener('change', wake);
+    };
+    const frame = (t: number) => {
+      raf = 0;
+      if (!g.isConnected) return stop();
+      if (!visible || document.hidden) return;
+      // Reduced motion (Neil's call, D15): the globe still turns, but slowly.
+      if (last) lon += (t - last) * (reduce.matches ? slowSpeed : fullSpeed);
+      last = t;
+      if (t - drawn >= (reduce.matches ? SLOW_FRAME_MS : FRAME_MS)) {
+        drawn = t;
+        const f = globeFrame(lon);
+        for (const k of Object.keys(parts) as (keyof typeof parts)[]) {
+          parts[k]?.setAttribute('d', f[k]);
+        }
+      }
+      raf = requestAnimationFrame(frame);
+    };
+    function wake() {
+      if (raf) return;
+      last = 0;
+      raf = requestAnimationFrame(frame);
+    }
+    io.observe(svg);
+    document.addEventListener('visibilitychange', wake);
+    reduce.addEventListener('change', wake);
+  }
+
+  function init() {
+    document.querySelectorAll<SVGGElement>('[data-ig-globe]:not([data-live])').forEach((g) => {
+      g.dataset.live = '';
+      spin(g);
+    });
+  }
+  document.addEventListener('astro:page-load', init);
+</script>
+
+<style>
+  .ig-logo {
+    height: auto;
+    max-width: 100%;
+    overflow: visible;
+  }
+  .ig-logo__shine {
+    animation: ig-shine 5s var(--ig-ease) infinite;
+  }
+  .ig-logo__glint {
+    animation: ig-glint 7s ease-in-out infinite;
+  }
+  .ig-logo__star {
+    animation: ig-twinkle 2.6s ease-in-out infinite;
+  }
+  .ig-globe__spec {
+    animation: ig-spec 6s ease-in-out infinite;
+  }
+  @keyframes ig-shine {
+    0%,
+    55% {
+      transform: skewX(-20deg) translateX(0);
+    }
+    100% {
+      transform: skewX(-20deg) translateX(3200px);
+    }
+  }
+  @keyframes ig-glint {
+    0%,
+    100% {
+      transform: translate(-60px, 40px);
+      opacity: 0.4;
+    }
+    50% {
+      transform: translate(160px, 160px);
+      opacity: 0.9;
+    }
+  }
+  @keyframes ig-spec {
+    0%,
+    100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 0.85;
+    }
+  }
+  @keyframes ig-twinkle {
+    0%,
+    100% {
+      transform: scale(0.55) rotate(0deg);
+      opacity: 0.55;
+    }
+    50% {
+      transform: scale(1.15) rotate(20deg);
+      opacity: 1;
+    }
+  }
+  /* Full Y2K coin flip, reserved for the boot screen (BootScreen.astro applies it). */
+  @keyframes ig-coin {
+    from {
+      transform: perspective(900px) rotateY(-720deg) scale(0.6);
+      opacity: 0;
+    }
+    to {
+      transform: perspective(900px) rotateY(0) scale(1);
+      opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ig-logo,
+    .ig-logo * {
+      animation: none !important;
+    }
+  }
+</style>

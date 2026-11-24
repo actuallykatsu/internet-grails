@@ -1,0 +1,64 @@
+/*
+ * Internet Grails design tokens.
+ * Restrained Y2K palette: platinum chrome, deep teal desktop, one hot accent.
+ */
+:root {
+  /* Surfaces */
+  --ig-desktop: #0f5c63;
+  --ig-desktop-deep: #083a40;
+  --ig-chrome: #d4d0c8;
+  --ig-chrome-light: #ffffff;
+  --ig-chrome-mid: #a6a29a;
+  --ig-chrome-dark: #4a4844;
+  --ig-paper: #fbfaf7;
+  --ig-ink: #141414;
+  --ig-ink-soft: #4b4b4b;
+
+  /* Title bars: platinum-to-ink gradient, Aqua-ish gloss for active */
+  --ig-title-active-a: #0b1f6b;
+  --ig-title-active-b: #3a76d8;
+  --ig-title-inactive-a: #7e7c77;
+  --ig-title-inactive-b: #b9b6ae;
+
+  /* Accents */
+  --ig-accent: #ff3ea5; /* hot pink, used sparingly */
+  --ig-accent-2: #33e1ff; /* cyan glow */
+  --ig-online: #23b04b;
+  --ig-away: #f2b705;
+  --ig-offline: #9b9b9b;
+
+  /* Chrome metal gradient for logo and Start button */
+  --ig-metal: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #c9ced6 22%,
+    #6f7682 48%,
+    #e9edf2 52%,
+    #a5adb8 78%,
+    #ffffff 100%
+  );
+
+  /* Type */
+  --ig-font-chrome: 'VT323', ui-monospace, monospace;
+  --ig-font-body: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Bevels */
+  --ig-bevel-out:
+    inset -1px -1px 0 var(--ig-chrome-dark), inset 1px 1px 0 var(--ig-chrome-light),
+    inset -2px -2px 0 var(--ig-chrome-mid), inset 2px 2px 0 #eeebe5;
+  --ig-bevel-in:
+    inset 1px 1px 0 var(--ig-chrome-dark), inset -1px -1px 0 var(--ig-chrome-light),
+    inset 2px 2px 0 var(--ig-chrome-mid);
+
+  /* Motion */
+  --ig-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ig-dur: 180ms;
+
+  --ig-taskbar-h: 40px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ig-dur: 0ms;
+  }
+}

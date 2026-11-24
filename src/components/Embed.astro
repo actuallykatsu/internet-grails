@@ -1,0 +1,89 @@
+---
+/** Embeds for YouTube, Spotify, SoundCloud, TikTok and X from a plain URL. */
+interface Props {
+  kind: 'youtube' | 'spotify' | 'soundcloud' | 'tiktok' | 'x';
+  url: string;
+  caption?: string;
+  title?: string;
+}
+const { kind, url, caption, title = 'Embedded media' } = Astro.props;
+
+function youtubeId(u: string): string | null {
+  const m = u.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/);
+  return m ? m[1] : null;
+}
+function spotifyEmbed(u: string): string {
+  const parsed = new URL(u);
+  return `https://open.spotify.com/embed${parsed.pathname}`;
+}
+const ytId = kind === 'youtube' ? youtubeId(url) : null;
+---
+
+<figure class={`ig-embed ig-embed--${kind}`}>
+  {kind === 'youtube' && ytId && (
+    <iframe
+      src={`https://www.youtube-nocookie.com/embed/${ytId}`}
+      title={title}
+      loading="lazy"
+      allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen
+    />
+  )}
+  {kind === 'spotify' && (
+    <iframe
+      src={spotifyEmbed(url)}
+      title={title}
+      loading="lazy"
+      height="352"
+      allow="clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+    />
+  )}
+  {kind === 'soundcloud' && (
+    <iframe
+      src={`https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&visual=true`}
+      title={title}
+      loading="lazy"
+      height="300"
+      allow="autoplay"
+    />
+  )}
+  {kind === 'x' && (
+    <>
+      <blockquote class="twitter-tweet">
+        <a href={url}>View post on X</a>
+      </blockquote>
+      <script is:inline async src="https://platform.twitter.com/widgets.js" />
+    </>
+  )}
+  {kind === 'tiktok' && (
+    <>
+      <blockquote class="tiktok-embed" cite={url}>
+        <a href={url}>View on TikTok</a>
+      </blockquote>
+      <script is:inline async src="https://www.tiktok.com/embed.js" />
+    </>
+  )}
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .ig-embed {
+    margin: 1.5rem 0;
+  }
+  .ig-embed iframe {
+    width: 100%;
+    border: 0;
+    box-shadow: var(--ig-bevel-in);
+    padding: 2px;
+    background: var(--ig-chrome);
+  }
+  .ig-embed--youtube iframe {
+    aspect-ratio: 16 / 9;
+    height: auto;
+  }
+  figcaption {
+    font-size: 0.85rem;
+    color: var(--ig-ink-soft);
+    margin-top: 6px;
+  }
+</style>
