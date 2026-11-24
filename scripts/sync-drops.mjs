@@ -93,14 +93,51 @@ function normalize(tweet) {
   };
 }
 
+/**
+ * Reads a drop the way the iPhone Shortcut might have written it. Phones turn straight
+ * quotes curly (Smart Punctuation), and a misconfigured date step can put line breaks
+ * inside a value; both make the file invalid JSON, so undo them before parsing.
+ */
+function readDrop(raw) {
+  try {
+    return { drop: JSON.parse(raw), repaired: false };
+  } catch {
+    const fixed = raw.replace(/[“”„‟″]/g, '"').replace(/[\r\n\t]+/g, ' ');
+    return { drop: JSON.parse(fixed), repaired: true };
+  }
+}
+
+/** addedAt must be one date. If it isn't, use now: the sync runs right after a drop lands. */
+function fixAddedAt(drop) {
+  const value = drop.addedAt;
+  if (typeof value === 'string' && /^\S+$/.test(value) && !isNaN(Date.parse(value))) return false;
+  drop.addedAt = new Date().toISOString();
+  return true;
+}
+
+const save = (full, drop) => writeFile(full, JSON.stringify(drop, null, 2) + '\n');
+
 const files = (await readdir(DIR)).filter((f) => f.endsWith('.json')).sort();
 let filled = 0;
 let failed = 0;
+let broken = 0;
 for (const file of files) {
   const id = path.basename(file, '.json');
   if (only.size && !only.has(id)) continue;
   const full = path.join(DIR, file);
-  const drop = JSON.parse(await readFile(full, 'utf8'));
+  let drop;
+  try {
+    const read = readDrop(await readFile(full, 'utf8'));
+    drop = read.drop;
+    if (fixAddedAt(drop) || read.repaired) {
+      await save(full, drop);
+      console.warn(`fix  ${id}  repaired the file the Shortcut wrote`);
+    }
+  } catch (err) {
+    broken++;
+    console.warn(`fail ${file}  not valid JSON, fix it by hand: ${err.message}`);
+    continue;
+  }
   if (drop.embedOnly || (drop.post && !force)) continue;
   if (!/^\d+$/.test(id)) {
     console.warn(`skip ${file}: name it after the post id`);
@@ -108,7 +145,7 @@ for (const file of files) {
   }
   try {
     drop.post = normalize(await fetchPost(id));
-    await writeFile(full, JSON.stringify(drop, null, 2) + '\n');
+    await save(full, drop);
     filled++;
     console.log(`ok   ${id}  ${drop.post.media.map((m) => m.type).join(',') || 'text'}`);
   } catch (err) {
@@ -117,4 +154,6 @@ for (const file of files) {
   }
   await new Promise((r) => setTimeout(r, 300));
 }
-console.log(`${filled} filled, ${failed} failed, ${files.length} drops`);
+console.log(`${filled} filled, ${failed} failed, ${broken} unreadable, ${files.length} drops`);
+// A post X won't share still works (it shows X's embed); only an unreadable file fails the run.
+if (broken) process.exitCode = 1;

@@ -4,3 +4,5 @@ node_modules
 package-lock.json
 *.md
 src/components/logo/paths.ts
+# Drops are written by the iPhone Shortcut and the sync script, not by hand (D25).
+src/content/drops/

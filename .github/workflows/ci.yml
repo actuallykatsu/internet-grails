@@ -17,9 +17,13 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run format:check
-      # A fake forms endpoint so the contact form test exercises the send path (D21).
+      # Build the real site first: this checks every real drop file (D25).
+      - run: npm run build
+      # Then rebuild for the tests, with the fixed sample drops and a fake forms endpoint
+      # so the contact form test exercises the send path (D21).
       - run: npm run build
         env:
+          DROPS_DIR: tests/fixtures/drops
           PUBLIC_CONTACT_ENDPOINT: https://forms.example.test/contact
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e

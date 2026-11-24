@@ -124,7 +124,8 @@ const dropMedia = z.discriminatedUnion('type', [
 ]);
 
 const drops = defineCollection({
-  loader: glob({ pattern: '*.json', base: './src/content/drops' }),
+  // Tests point DROPS_DIR at fixed sample drops (tests/fixtures/drops) so real posts can't move them.
+  loader: glob({ pattern: '*.json', base: process.env.DROPS_DIR ?? './src/content/drops' }),
   schema: z.object({
     url: z.url(),
     /** Leave out to go by the media: anything with a video or GIF is a video. */
