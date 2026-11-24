@@ -211,7 +211,7 @@ export default function Desktop({ posts, drops = [], children }: Props) {
       ))}
 
       <Taskbar
-        ticker={tickerItems(posts)}
+        ticker={tickerItems(posts, drops)}
         startItems={START_ITEMS}
         windows={wm.wins.map((w) => ({ id: w.id, title: w.title, active: wm.activeId === w.id }))}
         onStartItem={(item) => item.windowId && wm.open(item.windowId)}

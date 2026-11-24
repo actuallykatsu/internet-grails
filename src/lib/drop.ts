@@ -61,3 +61,29 @@ export function formatDropTime(iso: string): string {
 export function dayHref(day: string): string {
   return `/today/${day}/`;
 }
+
+/** The id of a drop's card on its day page. */
+export function dropAnchor(id: string): string {
+  return `drop-${id}`;
+}
+
+/** A link straight to one drop: its day page, scrolled to its card. */
+export function dropHref(drop: Pick<Drop, 'id' | 'day'>): string {
+  return `${dayHref(drop.day)}#${dropAnchor(drop.id)}`;
+}
+
+/**
+ * A one-line title for a drop, for the ticker and the drops feed: the post's first line
+ * without links, cut to `max` characters, or "Meme from @handle" when it has no text.
+ */
+export function dropHeadline(drop: Drop, max = 80): string {
+  const line = (drop.post?.text ?? '')
+    .replace(/https?:\/\/\S+/g, '')
+    .split('\n')
+    .map((l) => l.replace(/\s+/g, ' ').trim())
+    .find(Boolean);
+  const kind = drop.kind === 'video' ? 'Video' : 'Meme';
+  if (!line)
+    return drop.post ? `${kind} from ${drop.post.author.handle}` : `New ${kind.toLowerCase()}`;
+  return line.length > max ? `${line.slice(0, max - 1).trimEnd()}…` : line;
+}

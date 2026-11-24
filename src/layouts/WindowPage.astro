@@ -8,6 +8,7 @@ import Taskbar from '../components/desktop/Taskbar';
 import { SECTIONS } from '../lib/site';
 import { getPublishedPosts, toSummary } from '../lib/posts';
 import { tickerItems } from '../lib/ticker';
+import { getDrops } from '../lib/drops';
 import { PLAYER_START_ITEM, type StartItem } from '../components/desktop/Taskbar';
 
 interface Props {
@@ -39,7 +40,7 @@ const startItems: StartItem[] = [
   { label: 'About', icon: 'about', href: '/about/' },
   PLAYER_START_ITEM,
 ];
-const ticker = tickerItems((await getPublishedPosts()).map(toSummary));
+const ticker = tickerItems((await getPublishedPosts()).map(toSummary), await getDrops());
 ---
 
 <Base title={title} description={description} index={index}>

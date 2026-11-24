@@ -298,6 +298,36 @@ test('RSS feed lists published posts', async ({ request }) => {
   expect(xml).toContain('/posts/welcome-to-the-grails/');
 });
 
+// D32: drops get their own feed, apart from the articles.
+test('drops feed lists drops, newest first, linking to their day', async ({ request }) => {
+  const res = await request.get('/drops.xml');
+  expect(res.ok()).toBe(true);
+  const xml = await res.text();
+  expect(xml).toContain('<title>Internet Grails: drops</title>');
+  const titles = [...xml.matchAll(/<item><title>([^<]*)<\/title>/g)].map((m) => m[1]);
+  expect(titles[0]).toMatch(/^Sample video drop/);
+  expect(titles[1]).toBe('Sample meme drop: one image.');
+  expect(xml).toContain('/today/2026-11-24/#drop-sample-meme-1</link>');
+  expect(xml).not.toContain('/posts/welcome-to-the-grails/');
+  const rssXml = await (await request.get('/rss.xml')).text();
+  expect(rssXml).not.toContain('#drop-');
+});
+
+// D32: after breaking posts, the ticker shows the newest day's drops, each linking to its card.
+test('ticker shows the latest drops after breaking posts', async ({ page }) => {
+  await page.goto('/about/');
+  await hydrated(page);
+  const ticker = page.getByRole('region', { name: 'Breaking news' });
+  const links = ticker.locator('.ig-ticker__run:not([aria-hidden]) a');
+  await expect(links.first()).toHaveText('Welcome to Internet Grails');
+  await expect(links).toHaveCount(3);
+  const meme = ticker.getByRole('link', { name: 'New drop: Sample meme drop: one image.' }).first();
+  await expect(meme).toHaveAttribute('href', '/today/2026-11-24/#drop-sample-meme-1');
+  // It may be scrolled out of the ticker's view, so follow its link rather than click it.
+  await page.goto('/today/2026-11-24/#drop-sample-meme-1');
+  await expect(page.locator('#drop-sample-meme-1')).toBeInViewport();
+});
+
 // D24: Pagefind builds the index after `astro build`, so this needs the built site
 // (CI runs tests against `astro preview`). Under `astro dev` the window says so instead.
 test('search finds posts by their text', async ({ page }) => {

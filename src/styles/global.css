@@ -308,6 +308,12 @@ a {
 }
 .ig-xpost {
   margin: 0;
+  scroll-margin-top: 16px;
+}
+/* The drop a ticker or feed link points at (D32). */
+.ig-xpost:target {
+  outline: 3px solid var(--ig-accent);
+  outline-offset: 3px;
 }
 .ig-xpost__body {
   display: grid;

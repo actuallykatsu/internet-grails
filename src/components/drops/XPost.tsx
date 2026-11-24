@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import XEmbed from './XEmbed';
-import { formatDropTime, type Drop, type DropMedia } from '../../lib/drop';
+import { dropAnchor, formatDropTime, type Drop, type DropMedia } from '../../lib/drop';
 import { usePrefersReducedMotion } from '../../lib/motion';
 
 /**
@@ -100,7 +100,7 @@ export default function XPost({ drop, onOpenPhoto }: Props) {
 
   if (drop.embed || !post || broken) {
     return (
-      <article className="ig-xpost ig-xpost--embed" aria-label="Post on X">
+      <article id={dropAnchor(drop.id)} className="ig-xpost ig-xpost--embed" aria-label="Post on X">
         <XEmbed url={drop.url} />
       </article>
     );
@@ -108,7 +108,12 @@ export default function XPost({ drop, onOpenPhoto }: Props) {
 
   const label = `${post.author.name} (${post.author.handle})`;
   return (
-    <article className="ig-xpost ig-window" data-active="true" aria-label={`Post by ${label}`}>
+    <article
+      id={dropAnchor(drop.id)}
+      className="ig-xpost ig-window"
+      data-active="true"
+      aria-label={`Post by ${label}`}
+    >
       <div className="ig-titlebar">
         <span className="ig-titlebar__title">
           {drop.kind === 'video' ? 'Video' : 'Meme'} · {formatDropTime(post.createdAt)}

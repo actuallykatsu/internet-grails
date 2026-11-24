@@ -3,7 +3,7 @@ import { usePrefersReducedMotion } from '../../lib/motion';
 import type { TickerItem } from '../../lib/ticker';
 
 /**
- * The system-tray ticker for breaking posts (D23). Headlines scroll right to left and
+ * The system-tray ticker for breaking posts and the latest drops (D23, D32). Headlines scroll right to left and
  * stop while hovered, focused or paused with its button. With reduced motion it shows
  * one headline at a time and swaps every few seconds instead of scrolling. On phones it
  * sits in the status bar.
@@ -38,11 +38,16 @@ export default function Ticker({ items }: { items: TickerItem[] }) {
     </span>
   );
   const current = items[shown % items.length];
+  const breaking = items.some((it) => it.kind === 'breaking');
 
   return (
-    <section className="ig-ticker" aria-label="Breaking news" data-paused={paused || undefined}>
+    <section
+      className="ig-ticker"
+      aria-label={breaking ? 'Breaking news' : 'New drops'}
+      data-paused={paused || undefined}
+    >
       <span className="ig-ticker__label" aria-hidden="true">
-        Breaking
+        {breaking ? 'Breaking' : 'New'}
       </span>
       <div className="ig-ticker__window">
         {reduce ? (

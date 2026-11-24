@@ -25,7 +25,7 @@ Demo tip: the boot screen plays once per tab and never with reduced motion on. O
 
 - `src/lib/site.ts`: business identity (name, email, X, TikTok) and desktop sections. Edit contact details here only.
 - `src/content.config.ts`: the content model. Six post types: `news`, `meme-gallery`, `music-pick`, `trend-roundup`, `interview`, `daily-roundup`.
-- `src/content/posts/*.md`: posts (samples for now). Add `breaking: true` to a post's front matter to put it in the taskbar ticker; remove it when the story is no longer breaking. `src/content/authors/*.json`: authors.
+- `src/content/posts/*.md`: posts (samples for now). Add `breaking: true` to a post's front matter to put it in the taskbar ticker; remove it when the story is no longer breaking. After breaking posts, the ticker shows the newest day's drops (D32), up to five headlines in all (`src/lib/ticker.ts`). `src/content/authors/*.json`: authors.
 - `src/components/desktop/`: window manager, desktop and taskbar. Open windows are mirrored to `?w=` so they can be linked.
 - `src/components/ContactForm.tsx`: the contact form, used on `/contact` and in the desktop Contact window. It posts to the forms service in `PUBLIC_CONTACT_ENDPOINT` (see `.env.example`), or opens the email app when that is unset.
 - `src/components/Search.tsx`: the Search window. Pagefind indexes article text (pages with `searchable` on `WindowPage`) after the build.
@@ -33,7 +33,7 @@ Demo tip: the boot screen plays once per tab and never with reduced motion on. O
 - `tests/fixtures/drops/*.json`: fixed sample drops the tests use instead of the real ones (`DROPS_DIR`), so new posts never change what the tests see. CI builds the real site too, to check every real drop.
 - `src/components/drops/`: the retro post card (`XPost.tsx`), X's official embed fallback (`XEmbed.tsx`), the feed and the day view. Day pages are in `src/pages/today/`.
 - `src/lib/shareCards.ts` and `src/lib/shareImage.ts`: share images (D29), the picture shown when a link is shared on X, iMessage or Discord. Every page gets a 1200×630 PNG at `/og/<path>.png`, drawn at build time as a retro window with the page's title bar, title and summary. Add a page to `buildShareCards` to give it its own; pages left out use the homepage's.
-- `src/pages/rss.xml.ts`: the RSS feed at `/rss.xml`.
+- `src/pages/rss.xml.ts`: the RSS feed of articles at `/rss.xml`. `src/pages/drops.xml.ts`: the drops feed at `/drops.xml` (D32), the newest 60 drops with their pictures, each linking to its card on its day page (`/today/<day>/#drop-<id>`).
 - `src/layouts/WindowPage.astro`: real-URL pages (articles, Contact, About) shown as a maximized window.
 - `src/styles/tokens.css`: design tokens.
 - `/mockups/trend-roundup`, `/mockups/mobile`: Phase 0 mockups.
