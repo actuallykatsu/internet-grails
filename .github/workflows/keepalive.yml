@@ -1,0 +1,32 @@
+name: Keep Supabase awake
+
+# Free Supabase projects pause after a week without activity, which would switch off
+# "Grail it" and comments (D36, D37). Once a day, ask the database for a grail total;
+# that counts as activity. If this fails, the project may already be paused: restore it
+# from the Supabase dashboard.
+
+on:
+  schedule:
+    - cron: '23 9 * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ask Supabase for a grail total
+        env:
+          SUPABASE_URL: ${{ vars.PUBLIC_SUPABASE_URL }}
+          SUPABASE_KEY: ${{ vars.PUBLIC_SUPABASE_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_KEY" ]; then
+            echo "No Supabase project set up; nothing to keep awake."
+            exit 0
+          fi
+          curl -fsS --retry 3 --retry-delay 20 -X POST "${SUPABASE_URL%/}/rest/v1/rpc/grail_counts" \
+            -H "apikey: $SUPABASE_KEY" -H "Content-Type: application/json" \
+            -d '{"targets":["drop:keepalive"]}'
+          echo
+          echo "Supabase answered."

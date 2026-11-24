@@ -53,6 +53,7 @@ The "Grail it" button on every drop (D36) and the comments under each drop's pag
 - The build needs `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_KEY` (the publishable key, `sb_publishable_...`). Both are public. Locally they go in `.env` (see `.env.example`); the preview deploy reads them from the repository's Actions **variables**. Without them, the buttons are hidden. Never put the secret key (`sb_secret_...` or `service_role`) in the site, `.env` or chat.
 - In the dashboard, **Authentication → Sign In / Providers → Allow anonymous sign-ins** must be on: a visitor's first grail (or report) signs them in anonymously.
 - Comment sign-in is an emailed link. **Authentication → URL Configuration** needs the Site URL `https://preview.internetgrails.com` and the Redirect URLs `https://preview.internetgrails.com/**` and `http://localhost:4321/**`, so links lead back to the drop the visitor was on. Supabase's built-in email sender allows only a few emails an hour; connect a sending service (Resend, say) under **Authentication → Emails → SMTP Settings** before launch.
+- Free Supabase projects pause after a week without activity. The "Keep Supabase awake" Action (`.github/workflows/keepalive.yml`) asks the database for a grail total once a day so that never happens. If it fails, check the project in the Supabase dashboard (restore it if it's paused).
 - Tests and CI use a fake project (`https://grails.example.test`) whose requests the tests answer, so they never touch the real one.
 
 ## Preview deploy
