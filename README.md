@@ -32,6 +32,7 @@ Demo tip: the boot screen plays once per tab and never with reduced motion on. O
 - `src/content/drops/*.json`: drops, one per X post (D25). The iPhone Shortcut adds them (setup: `docs/drops-iphone-shortcut.md`); `scripts/sync-drops.mjs` and the "Sync drops" GitHub Action copy in the post's text and media. Add `"draft": true` to hide one, `"kind"` to override meme/video, `"embedOnly": true` to always use X's embed. Prettier skips this folder because the phone and the sync script write it.
 - `tests/fixtures/drops/*.json`: fixed sample drops the tests use instead of the real ones (`DROPS_DIR`), so new posts never change what the tests see. CI builds the real site too, to check every real drop.
 - `src/components/drops/`: the retro post card (`XPost.tsx`), X's official embed fallback (`XEmbed.tsx`), the feed and the day view. Day pages are in `src/pages/today/`.
+- `src/lib/shareCards.ts` and `src/lib/shareImage.ts`: share images (D29), the picture shown when a link is shared on X, iMessage or Discord. Every page gets a 1200×630 PNG at `/og/<path>.png`, drawn at build time as a retro window with the page's title bar, title and summary. Add a page to `buildShareCards` to give it its own; pages left out use the homepage's.
 - `src/pages/rss.xml.ts`: the RSS feed at `/rss.xml`.
 - `src/layouts/WindowPage.astro`: real-URL pages (articles, Contact, About) shown as a maximized window.
 - `src/styles/tokens.css`: design tokens.

@@ -12,6 +12,11 @@ export const POST_TYPE_LABELS: Record<PostType, string> = {
   'daily-roundup': "Today's Grails",
 };
 
+/** The title bar text of a post's window, also drawn on its share image. */
+export function postWindowTitle({ type, title }: Post['data']): string {
+  return type === 'interview' ? `Now Showing: ${title}` : `${POST_TYPE_LABELS[type]} - ${title}`;
+}
+
 /** Published posts, newest first. Drafts show only in dev. */
 export async function getPublishedPosts(): Promise<Post[]> {
   const posts = await getCollection('posts', ({ data }) => import.meta.env.DEV || !data.draft);

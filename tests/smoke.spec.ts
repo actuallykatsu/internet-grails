@@ -40,6 +40,28 @@ test('pages send no referrer to other sites, so X videos play', async ({ page })
   }
 });
 
+// Share images (D29): each page points at its own 1200×630 PNG, and it exists.
+test('pages have their own share image', async ({ page, request }) => {
+  const pages = {
+    '/': '/og/index.png',
+    '/about/': '/og/about.png',
+    '/today/': '/og/today.png',
+    '/posts/welcome-to-the-grails/': '/og/posts/welcome-to-the-grails.png',
+    '/mockups/mobile/': '/og/index.png',
+  };
+  for (const [url, image] of Object.entries(pages)) {
+    await page.goto(url);
+    const content = await page.locator('meta[property="og:image"]').getAttribute('content');
+    expect(new URL(content ?? '').pathname, url).toBe(image);
+    const res = await request.get(image);
+    expect(res.ok(), image).toBe(true);
+    expect(res.headers()['content-type']).toContain('image/png');
+    // A PNG's width and height sit at bytes 16-23 of its header.
+    const png = await res.body();
+    expect([png.readUInt32BE(16), png.readUInt32BE(20)], image).toEqual([1200, 630]);
+  }
+});
+
 test('phone layout: apps fill the screen and back goes home', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'phone layout only');
   await page.goto('/?w=news');

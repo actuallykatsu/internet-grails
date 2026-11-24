@@ -8,6 +8,7 @@ import { ClientRouter } from 'astro:transitions';
 import { SITE, organizationJsonLd } from '../lib/site';
 import GrailPlayer from '../components/player/GrailPlayer';
 import { TRACKS } from '../lib/tracks';
+import { SHARE_IMAGE_SIZE, shareImageFor } from '../lib/shareCards';
 
 interface Props {
   title?: string;
@@ -19,6 +20,9 @@ interface Props {
 const { title, description = SITE.tagline, index = true } = Astro.props;
 const fullTitle = title ? `${title} · ${SITE.name}` : `${SITE.name}: ${SITE.tagline}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+// Every page's share image is drawn as a retro window (D29).
+const shareImage = new URL(await shareImageFor(Astro.url.pathname), Astro.site);
+const shareAlt = `${title ?? SITE.name}, shown as a window on the ${SITE.name} desktop`;
 ---
 
 <!doctype html>
@@ -35,7 +39,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <meta property="og:image" content={new URL('/logo.png', Astro.site)} />
+    <meta property="og:image" content={shareImage} />
+    <meta property="og:image:width" content={String(SHARE_IMAGE_SIZE.width)} />
+    <meta property="og:image:height" content={String(SHARE_IMAGE_SIZE.height)} />
+    <meta property="og:image:alt" content={shareAlt} />
+    <meta name="twitter:image" content={shareImage} />
+    <meta name="twitter:image:alt" content={shareAlt} />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="alternate" type="application/rss+xml" title={SITE.name} href="/rss.xml" />
     {!index && <meta name="robots" content="noindex" />}
