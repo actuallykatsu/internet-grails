@@ -1,0 +1,20 @@
+---
+import WindowPage from '../layouts/WindowPage.astro';
+import ModQueue from '../components/ModQueue';
+
+/* The moderation page (D37). Never indexed or linked from public pages; the database only
+ * answers moderators, so there's nothing here for anyone else. */
+---
+
+<WindowPage
+  title="Moderation"
+  windowTitle="Moderation - Internet Grails"
+  description="Comment moderation."
+  index={false}
+>
+  <h1>Moderation</h1>
+  <ModQueue client:load />
+  <noscript>
+    <p>This page needs JavaScript.</p>
+  </noscript>
+</WindowPage>

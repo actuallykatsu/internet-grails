@@ -8,7 +8,11 @@ export default defineConfig({
   // https://preview.internetgrails.com (D30); any address other than the real one marks
   // every page noindex (see Base.astro).
   site: process.env.SITE_URL || 'https://internetgrails.com',
-  integrations: [react(), sitemap()],
+  // The moderation page (D37) stays out of the sitemap.
+  integrations: [
+    react(),
+    sitemap({ filter: (page) => !new URL(page).pathname.startsWith('/mod/') }),
+  ],
   prefetch: true,
   // The dev toolbar floats over the bottom of the page, where the taskbar and the
   // mobile mini player live, so it's off.

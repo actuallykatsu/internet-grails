@@ -447,6 +447,244 @@ test('Grail it undoes itself when saving fails', async ({ page }) => {
   await expect(button).toHaveAttribute('aria-pressed', 'false');
 });
 
+// D37: comments, against the same fake Supabase project.
+function fakeSignIn(userId: string, email?: string) {
+  const b64 = (o: object) => Buffer.from(JSON.stringify(o)).toString('base64url');
+  const now = Math.floor(Date.now() / 1000);
+  const user = {
+    id: userId,
+    aud: 'authenticated',
+    role: 'authenticated',
+    email,
+    is_anonymous: !email,
+  };
+  const access_token = `${b64({ alg: 'HS256', typ: 'JWT' })}.${b64({ sub: userId, role: 'authenticated', exp: now + 3600, is_anonymous: !email })}.sig`;
+  const session = {
+    access_token,
+    token_type: 'bearer',
+    expires_in: 3600,
+    expires_at: now + 3600,
+    refresh_token: 'refresh-test',
+    user,
+  };
+  return { user, session };
+}
+
+const COMMENT_ANN = {
+  id: '10000000-0000-4000-8000-000000000001',
+  parent_id: null,
+  body: 'This one lives rent free.',
+  created_at: '2026-11-24T15:42:00Z',
+  user_id: '20000000-0000-4000-8000-00000000000a',
+  author: { display_name: 'Ann' },
+};
+const COMMENT_BOB = {
+  id: '10000000-0000-4000-8000-000000000002',
+  parent_id: COMMENT_ANN.id,
+  body: 'Same',
+  created_at: '2026-11-24T15:43:00Z',
+  user_id: '20000000-0000-4000-8000-00000000000b',
+  author: { display_name: 'bob 99' },
+};
+
+test('comments: guests read them and get a sign-in link by email', async ({ page }) => {
+  let otp: { body: unknown; url: string } | undefined;
+  await page.route('https://grails.example.test/**', (route) => {
+    const req = route.request();
+    const url = new URL(req.url());
+    if (url.pathname === '/rest/v1/comments') {
+      expect(url.searchParams.get('target')).toBe('eq.drop:sample-meme-1');
+      return route.fulfill({ json: [COMMENT_ANN, COMMENT_BOB] });
+    }
+    if (url.pathname === '/auth/v1/otp') {
+      otp = { body: req.postDataJSON(), url: req.url() };
+      return route.fulfill({ json: {} });
+    }
+    return route.fulfill({ json: [] });
+  });
+  await page.goto('/drops/sample-meme-1/');
+  await hydrated(page);
+  const chat = page.getByRole('region', { name: /^Comments/ });
+  await expect(chat.getByRole('heading')).toHaveText('Comments (2)');
+  await expect(chat.getByRole('log')).toContainText('Ann');
+  await expect(chat.getByRole('log')).toContainText('This one lives rent free.');
+  await expect(chat.locator('[data-reply]')).toContainText('Same');
+  // Guests can report but not reply.
+  await expect(chat.getByRole('button', { name: 'Reply' })).toHaveCount(0);
+  await expect(chat.getByRole('button', { name: 'Report' })).toHaveCount(2);
+
+  await chat.getByRole('button', { name: 'Sign in' }).click();
+  await chat.getByLabel('Email').fill('ann@example.com');
+  await chat.getByRole('button', { name: 'Send sign-in link' }).click();
+  await expect(chat.getByRole('status')).toContainText('Check your email');
+  expect(otp?.body).toMatchObject({ email: 'ann@example.com', create_user: true });
+  expect(decodeURIComponent(otp!.url)).toContain(
+    'redirect_to=http://localhost:4322/drops/sample-meme-1/',
+  );
+});
+
+test('comments: a member arriving from the email link picks a name, posts, replies and reports', async ({
+  page,
+}) => {
+  const me = fakeSignIn('30000000-0000-4000-8000-000000000001', 'me@example.com');
+  let profile: unknown[] = [];
+  const posted: Record<string, unknown>[] = [];
+  const reports: unknown[] = [];
+  page.on('dialog', (d) => d.accept());
+  await page.route('https://grails.example.test/**', (route) => {
+    const req = route.request();
+    const url = new URL(req.url());
+    if (url.pathname === '/auth/v1/user') return route.fulfill({ json: me.user });
+    if (url.pathname === '/rest/v1/rpc/is_moderator') return route.fulfill({ json: false });
+    if (url.pathname === '/rest/v1/profiles') {
+      if (req.method() === 'POST') {
+        expect(req.postDataJSON()).toEqual({ display_name: 'Grail Hunter' });
+        profile = [{ display_name: 'Grail Hunter' }];
+        return route.fulfill({ status: 201, body: '' });
+      }
+      return route.fulfill({ json: profile });
+    }
+    if (url.pathname === '/rest/v1/comments') {
+      if (req.method() === 'POST') {
+        const body = req.postDataJSON();
+        posted.push(body);
+        return route.fulfill({
+          status: 201,
+          json: [
+            {
+              id: `40000000-0000-4000-8000-00000000000${posted.length}`,
+              parent_id: body.parent_id,
+              body: body.body,
+              created_at: new Date().toISOString(),
+              user_id: me.user.id,
+            },
+          ],
+        });
+      }
+      return route.fulfill({ json: [COMMENT_ANN, COMMENT_BOB] });
+    }
+    if (url.pathname === '/rest/v1/comment_reports') {
+      reports.push(req.postDataJSON());
+      return route.fulfill({ status: 201, body: '' });
+    }
+    return route.fulfill({ json: [] });
+  });
+
+  const s = me.session;
+  await page.goto(
+    `/drops/sample-meme-1/#access_token=${s.access_token}&expires_at=${s.expires_at}&expires_in=3600&refresh_token=${s.refresh_token}&token_type=bearer&type=magiclink`,
+  );
+  await hydrated(page);
+  const chat = page.getByRole('region', { name: /^Comments/ });
+  // The sign-in is picked up and the address tidied.
+  await expect(chat.getByLabel('Pick a screen name')).toBeVisible();
+  await expect(page).toHaveURL(/\/drops\/sample-meme-1\/$/);
+
+  await chat.getByLabel('Pick a screen name').fill('Grail  Hunter ');
+  await chat.getByRole('button', { name: 'Save' }).click();
+  await expect(chat).toContainText('Signed in as Grail Hunter');
+
+  const box = chat.getByRole('textbox', { name: 'Your comment' });
+  await box.fill('Peak internet.');
+  await box.press('Enter');
+  await expect(chat.getByRole('log')).toContainText('Peak internet.');
+  await expect(chat.getByRole('heading')).toHaveText('Comments (3)');
+  expect(posted[0]).toEqual({
+    target: 'drop:sample-meme-1',
+    body: 'Peak internet.',
+    parent_id: null,
+  });
+  await expect(chat.locator('.ig-chat__name[data-own]')).toHaveText('Grail Hunter');
+
+  // Reply to Bob's reply: it's filed under Ann's comment by the database.
+  await chat.locator('[data-reply]').getByRole('button', { name: 'Reply' }).click();
+  await expect(chat).toContainText('Replying to bob 99');
+  await chat.getByRole('textbox', { name: 'Your reply' }).fill('Same here');
+  await chat.getByRole('button', { name: 'Send' }).click();
+  await expect.poll(() => posted.length).toBe(2);
+  expect(posted[1]).toMatchObject({ parent_id: COMMENT_BOB.id, body: 'Same here' });
+  await expect(chat).not.toContainText('Replying to');
+  await expect(chat.locator('[data-reply]').filter({ hasText: 'Same here' })).toBeVisible();
+  await expect(chat.getByRole('heading')).toHaveText('Comments (4)');
+
+  await chat
+    .getByRole('listitem')
+    .filter({ hasText: 'This one lives rent free.' })
+    .getByRole('button', { name: 'Report' })
+    .first()
+    .click();
+  await expect.poll(() => reports).toEqual([{ comment_id: COMMENT_ANN.id }]);
+  await expect(chat.getByText('Reported')).toBeVisible();
+
+  // Next visit: still signed in.
+  await page.reload();
+  await hydrated(page);
+  await expect(chat).toContainText('Signed in as Grail Hunter');
+});
+
+test('moderation page hides a comment and bans its writer', async ({ page }) => {
+  const mod = fakeSignIn('30000000-0000-4000-8000-00000000000f', 'mod@example.com');
+  await page.addInitScript(
+    (session) => localStorage.setItem('ig-grails-auth', JSON.stringify(session)),
+    mod.session,
+  );
+  let hidden = false;
+  let banned = false;
+  const calls: { fn: string; args: unknown }[] = [];
+  page.on('dialog', (d) => d.accept());
+  await page.route('https://grails.example.test/**', (route) => {
+    const req = route.request();
+    const path = new URL(req.url()).pathname;
+    if (path === '/rest/v1/rpc/is_moderator') return route.fulfill({ json: true });
+    if (path === '/rest/v1/rpc/moderation_comments')
+      return route.fulfill({
+        json: [
+          {
+            ...COMMENT_ANN,
+            target: 'drop:sample-meme-1',
+            display_name: 'Ann',
+            hidden,
+            banned,
+            reports: 2,
+          },
+        ],
+      });
+    if (path === '/rest/v1/rpc/moderate_comment' || path === '/rest/v1/rpc/set_banned') {
+      const args = req.postDataJSON();
+      calls.push({ fn: path.split('/').pop()!, args });
+      if ('p_hide' in args) hidden = args.p_hide;
+      if ('p_banned' in args) banned = args.p_banned;
+      return route.fulfill({ status: 204, body: '' });
+    }
+    return route.fulfill({ json: [] });
+  });
+  await page.goto('/mod/');
+  await hydrated(page);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+  const item = page.locator('.ig-mod__item');
+  await expect(item).toContainText('This one lives rent free.');
+  await expect(item).toContainText('2 reports');
+  await expect(item.getByRole('link', { name: /drop:sample-meme-1/ })).toHaveAttribute(
+    'href',
+    '/drops/sample-meme-1/#comments',
+  );
+
+  await item.getByRole('button', { name: 'Hide' }).click();
+  await expect(item.getByRole('button', { name: 'Unhide' })).toBeVisible();
+  await item.getByRole('button', { name: 'Ban' }).click();
+  await expect(item.getByRole('button', { name: 'Unban' })).toBeVisible();
+  expect(calls).toEqual([
+    { fn: 'moderate_comment', args: { p_comment: COMMENT_ANN.id, p_hide: true } },
+    { fn: 'set_banned', args: { p_user: COMMENT_ANN.user_id, p_banned: true } },
+  ]);
+});
+
+test('moderation page turns away visitors who are not moderators', async ({ page }) => {
+  await page.goto('/mod/');
+  await hydrated(page);
+  await expect(page.getByText('Sign in first')).toBeVisible();
+});
+
 test('drops feed lists drops, newest first, linking to their day', async ({ request }) => {
   const res = await request.get('/drops.xml');
   expect(res.ok()).toBe(true);

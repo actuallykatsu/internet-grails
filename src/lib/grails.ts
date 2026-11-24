@@ -1,6 +1,11 @@
 import { useEffect, useSyncExternalStore } from 'react';
-import type { SupabaseClient } from '@supabase/supabase-js';
-import { PUBLIC_SUPABASE_KEY, PUBLIC_SUPABASE_URL } from 'astro:env/client';
+import {
+  SUPABASE_URL as API,
+  hasStoredSession as hasSession,
+  readHeaders,
+  supabase,
+  supabaseEnabled,
+} from './supabase';
 
 /**
  * "Grail it" likes (D36), stored in Supabase (see supabase/migrations/). Totals come
@@ -9,14 +14,8 @@ import { PUBLIC_SUPABASE_KEY, PUBLIC_SUPABASE_URL } from 'astro:env/client';
  * grail signs them in anonymously, so a like belongs to a visitor without an account.
  */
 
-const API = PUBLIC_SUPABASE_URL?.replace(/\/$/, '');
-const KEY = PUBLIC_SUPABASE_KEY;
-
 /** False when the build has no Supabase project: the buttons are hidden. */
-export const grailsEnabled = !!(API && KEY);
-
-/** Where the anonymous sign-in is kept in the browser (localStorage). */
-export const GRAILS_STORAGE_KEY = 'ig-grails-auth';
+export const grailsEnabled = supabaseEnabled;
 
 export type GrailTarget = `drop:${string}` | `post:${string}`;
 
@@ -39,32 +38,10 @@ function set(t: string, patch: Partial<State>) {
   listeners.forEach((l) => l());
 }
 
-let client: Promise<SupabaseClient> | undefined;
-function supabase() {
-  return (client ??= import('@supabase/supabase-js').then(({ createClient }) =>
-    createClient(API!, KEY!, {
-      auth: {
-        storageKey: GRAILS_STORAGE_KEY,
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: false,
-      },
-    }),
-  ));
-}
-
-const hasSession = () => {
-  try {
-    return !!localStorage.getItem(GRAILS_STORAGE_KEY);
-  } catch {
-    return false;
-  }
-};
-
 async function loadCounts(targets: string[]) {
   const res = await fetch(`${API}/rest/v1/rpc/grail_counts`, {
     method: 'POST',
-    headers: { apikey: KEY!, 'Content-Type': 'application/json' },
+    headers: readHeaders(),
     body: JSON.stringify({ targets }),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);

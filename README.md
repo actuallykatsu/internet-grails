@@ -42,14 +42,17 @@ Demo tip: the boot screen plays once per tab and never with reduced motion on. O
 - `src/components/icons/pixelIcons.ts`: the pixel icons, one text grid per icon (D16).
 - `src/components/Logo.astro`: the logo (`full` wordmark or compact `mark`). Its paths come from `nostalgia_logo_v1.png`; after changing the artwork, run `node scripts/trace-logo.mjs` (and update `SPARKLE_HINTS` / `FOREGROUND_HINTS` there if sparkles or the pieces in front of the globe move). The spinning globe lives in `src/components/logo/globe.ts`; set `LOGO_VARIANT = 'classic'` in `src/lib/site.ts` to go back to the flat logo.
 
-## Supabase ("Grail it" likes)
+## Supabase ("Grail it" likes and comments)
 
-The "Grail it" button on every drop (D36) stores likes in a Supabase project. The site stays static: browsers talk to Supabase directly, and the database's row-level security decides what they may do.
+The "Grail it" button on every drop (D36) and the comments under each drop's page (D37) live in a Supabase project. The site stays static: browsers talk to Supabase directly, and the database's row-level security decides what they may do.
 
 - `supabase/migrations/`: the database setup, as SQL. To apply a new file, paste it into the Supabase dashboard's **SQL Editor** and click **Run**. Each file is safe to run twice.
+- `src/lib/supabase.ts`: the one shared connection, loaded only when needed.
 - `src/lib/grails.ts`: totals (one request per page, for every button on it), the visitor's own grails, and the toggle. `src/components/GrailButton.tsx`: the button.
+- `src/components/Comments.tsx`: the chat-style comments window on each drop page, with email sign-in, screen names, replies, Report and Delete. `src/components/ModQueue.tsx` and `/mod/`: the moderation page (Hide, Ban). To make someone a moderator, once they've signed in and picked a screen name, run the `update public.profiles set moderator = true ...` line at the end of `supabase/migrations/20261124010000_comments.sql` with their name.
 - The build needs `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_KEY` (the publishable key, `sb_publishable_...`). Both are public. Locally they go in `.env` (see `.env.example`); the preview deploy reads them from the repository's Actions **variables**. Without them, the buttons are hidden. Never put the secret key (`sb_secret_...` or `service_role`) in the site, `.env` or chat.
-- In the dashboard, **Authentication → Sign In / Providers → Allow anonymous sign-ins** must be on: a visitor's first grail signs them in anonymously.
+- In the dashboard, **Authentication → Sign In / Providers → Allow anonymous sign-ins** must be on: a visitor's first grail (or report) signs them in anonymously.
+- Comment sign-in is an emailed link. **Authentication → URL Configuration** needs the Site URL `https://preview.internetgrails.com` and the Redirect URLs `https://preview.internetgrails.com/**` and `http://localhost:4321/**`, so links lead back to the drop the visitor was on. Supabase's built-in email sender allows only a few emails an hour; connect a sending service (Resend, say) under **Authentication → Emails → SMTP Settings** before launch.
 - Tests and CI use a fake project (`https://grails.example.test`) whose requests the tests answer, so they never touch the real one.
 
 ## Preview deploy

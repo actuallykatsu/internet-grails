@@ -20,7 +20,7 @@ const mail = `mailto:${SITE.email}`;
   <h1>Privacy policy</h1>
   <p>
     The short version: {SITE.name} has no ads and no analytics, and sets no cookies. We know only
-    what you choose to give us: a message, or the posts you grail.
+    what you choose to give us: a message, the posts you grail, or the comments you write.
   </p>
 
   <h2>Who we are</h2>
@@ -49,6 +49,14 @@ const mail = `mailto:${SITE.email}`;
       Supabase, also logs the IP address of each sign-in to protect the service. Grails are stored
       on Supabase's servers in the United States.
     </li>
+    <li>
+      <strong>Your account and comments.</strong> To comment, you sign in with your email address:
+      we email you a link, and there's no password. We keep your email address to sign you in and
+      never show it to anyone. You pick a screen name, which is public, and your comments are public
+      too, with the time you posted them. If you report a comment, we store that you reported it;
+      only our moderators see that. Accounts and comments are stored by Supabase in the United
+      States, and the sign-in emails are sent through it.
+    </li>
   </ul>
   <p>
     We don't sell personal information, and we don't share it except with the services that run the
@@ -62,9 +70,9 @@ const mail = `mailto:${SITE.email}`;
       That note never leaves your device and disappears when you close the tab.
     </li>
     <li>
-      Once you've grailed something, your browser keeps your anonymous sign-in in its local storage
-      so your grails are still yours next time. Clearing this site's data in your browser forgets
-      it.
+      Once you've grailed, reported or signed in, your browser keeps that sign-in in its local
+      storage so you're still you next time. Signing out, or clearing this site's data in your
+      browser, forgets it.
     </li>
   </ul>
 
@@ -87,15 +95,15 @@ const mail = `mailto:${SITE.email}`;
   <p>
     You can ask us what we hold about you, ask us to correct it, or ask us to delete it, by emailing{' '}
     <a href={mail}>{SITE.email}</a>. You can take back a grail any time by pressing the button
-    again. Depending on where you live, you may have further rights under local law; we'll honor
+    again, and delete your own comments any time. To close your account and remove your comments,
+    email us. Depending on where you live, you may have further rights under local law; we'll honor
     them.
   </p>
 
   <h2>Coming soon, and changes</h2>
   <p>
-    We plan to add comments, accounts and a newsletter. Before any of those go live, we'll update
-    this policy to say what they store and why. When this policy changes, the date below changes
-    too.
+    We plan to add a newsletter. Before it goes live, we'll update this policy to say what it stores
+    and why. When this policy changes, the date below changes too.
   </p>
 
   <PolicyLinks />

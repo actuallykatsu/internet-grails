@@ -1,6 +1,7 @@
 ---
 import WindowPage from '../../layouts/WindowPage.astro';
 import DropFeed from '../../components/drops/DropFeed';
+import Comments from '../../components/Comments';
 import { getDrops } from '../../lib/drops';
 import {
   dayHref,
@@ -44,6 +45,8 @@ const description = drop.post?.text
   </header>
 
   <DropFeed client:load drops={[drop]} />
+
+  <Comments client:idle target={`drop:${drop.id}`} />
 
   <nav class="ig-drop__nav" aria-label="More drops">
     <a class="ig-btn" href={dropDayHref(drop)}>
