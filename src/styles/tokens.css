@@ -38,7 +38,12 @@
     #ffffff 100%
   );
 
-  /* Type */
+  /* Type (D18): one font per region, never mixed inside one.
+   * --ig-font-chrome (VT323): the "operating system" only: title bars, taskbar,
+   *   Start button and menu, buttons, desktop icon labels, tray, boot screen,
+   *   the official strip and skinned widgets like the media player.
+   * --ig-font-body (Inter): everything inside a window's content pane:
+   *   headings, meta lines, kickers, lists and prose. */
   --ig-font-chrome: 'VT323', ui-monospace, monospace;
   --ig-font-body: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
 

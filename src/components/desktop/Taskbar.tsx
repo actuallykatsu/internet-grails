@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { openPlayer, playerStore, togglePlayerMinimized, toggleMuted } from '../../lib/player';
 import { SITE } from '../../lib/site';
 import PixelIcon from '../icons/PixelIcon';
 import type { IconName } from '../icons/pixelIcons';
@@ -8,9 +9,14 @@ export interface StartItem {
   icon: IconName;
   /** Opens a desktop window when on the desktop... */
   windowId?: string;
-  /** ...or navigates to a real URL. */
+  /** ...or navigates to a real URL... */
   href?: string;
+  /** ...or opens the background player (D19). */
+  player?: true;
 }
+
+/** Start menu entry for the background player, shared by every page. */
+export const PLAYER_START_ITEM: StartItem = { label: 'Grail Player', icon: 'player', player: true };
 
 interface Props {
   startItems: StartItem[];
@@ -39,7 +45,11 @@ function Clock() {
 
 export default function Taskbar({ startItems, windows = [], onStartItem, onWindowButton }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [muted, setMuted] = useState(true);
+  const player = useSyncExternalStore(
+    playerStore.subscribe,
+    playerStore.get,
+    playerStore.getServer,
+  );
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -81,7 +91,18 @@ export default function Taskbar({ startItems, windows = [], onStartItem, onWindo
             <ul>
               {startItems.map((item) => (
                 <li key={item.label}>
-                  {item.windowId && onStartItem ? (
+                  {item.player ? (
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        openPlayer();
+                      }}
+                    >
+                      <PixelIcon name={item.icon} size={16} /> {item.label}
+                    </button>
+                  ) : item.windowId && onStartItem ? (
                     <button
                       type="button"
                       role="menuitem"
@@ -116,6 +137,16 @@ export default function Taskbar({ startItems, windows = [], onStartItem, onWindo
             {w.title}
           </button>
         ))}
+        {player.open && (
+          <button
+            type="button"
+            className="ig-btn ig-taskbar__win"
+            aria-pressed={!player.minimized}
+            onClick={togglePlayerMinimized}
+          >
+            Grail Player
+          </button>
+        )}
       </nav>
 
       <div className="ig-tray">
@@ -126,11 +157,11 @@ export default function Taskbar({ startItems, windows = [], onStartItem, onWindo
         <button
           type="button"
           className="ig-tray__sound"
-          aria-label={muted ? 'Sound off. Turn sound on' : 'Sound on. Turn sound off'}
-          aria-pressed={!muted}
-          onClick={() => setMuted((m) => !m)}
+          aria-label={player.muted ? 'Sound off. Turn sound on' : 'Sound on. Turn sound off'}
+          aria-pressed={!player.muted}
+          onClick={toggleMuted}
         >
-          {muted ? '🔇' : '🔊'}
+          {player.muted ? '🔇' : '🔊'}
         </button>
         <Clock />
       </div>

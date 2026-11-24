@@ -43,22 +43,74 @@ test('logo globe spins, slowly for reduced motion', async ({ browser }) => {
   }
 });
 
-test('media player mockup plays and changes track', async ({ page }) => {
-  await page.goto('/mockups/media-player/');
+test('background player plays, minimizes and survives navigation', async ({ page, isMobile }) => {
+  await page.goto('/?w=contact');
   await hydrated(page);
-  const player = page.getByRole('region', { name: /Media player/ });
-  await player.getByRole('button', { name: 'Play' }).click();
+  await page.getByRole('button', { name: 'Start' }).click();
+  await page.getByRole('menuitem', { name: 'Grail Player' }).click();
+  const player = page.getByRole('region', { name: 'Grail Player' });
+  await player.getByRole('button', { name: 'Play', exact: true }).click();
   await expect(player).toContainText('0:01 /');
   await player.getByRole('button', { name: 'Next track' }).click();
   await expect(player.getByRole('button', { name: /Away Message/ })).toHaveAttribute(
     'aria-current',
     'true',
   );
+
+  // Minimize to the taskbar, then restore from it.
+  await player.getByRole('button', { name: 'Minimize player' }).click();
+  await expect(player).toBeHidden();
+  if (isMobile) {
+    // Phones get a mini player bar instead (the taskbar is cramped there).
+    await page
+      .getByRole('region', { name: 'Now playing' })
+      .getByRole('button', { name: /Away Message/ })
+      .click();
+  } else {
+    await page
+      .getByRole('navigation', { name: 'Open windows' })
+      .getByRole('button', { name: 'Grail Player' })
+      .click();
+  }
+  await expect(player).toBeVisible();
+
+  // A client-side page change keeps the same player, still on the same track and playing.
+  await page.evaluate(() => ((window as unknown as { igMarker: boolean }).igMarker = true));
+  await page.getByRole('link', { name: /full Contact page/ }).click();
+  await expect(page).toHaveURL(/\/contact\/$/);
+  const marker = await page.evaluate(() => (window as unknown as { igMarker?: boolean }).igMarker);
+  expect(marker, 'navigation should not reload the page').toBe(true);
+  await expect(player).toContainText('Away Message');
+  await expect(player.getByRole('button', { name: 'Pause', exact: true })).toBeVisible();
 });
 
 test('mobile wireframes render three screens', async ({ page }) => {
   await page.goto('/mockups/mobile/');
   await expect(page.locator('.ig-phone')).toHaveCount(3);
+});
+
+// D18: one font per region. Inside window content panes everything reads in the body
+// font; only chrome (title bars, buttons) uses the pixel font.
+test('window contents use a single font', async ({ page }) => {
+  for (const url of ['/?w=news,contact,about,memes', '/posts/sample-trend-roundup/']) {
+    await page.goto(url);
+    const offenders = await page.evaluate(() => {
+      const bad: string[] = [];
+      for (const body of document.querySelectorAll('.ig-window__body')) {
+        for (const el of body.querySelectorAll<HTMLElement>('*')) {
+          if (el.closest('.ig-titlebar, .ig-btn, svg')) continue;
+          const hasText = [...el.childNodes].some(
+            (n) => n.nodeType === Node.TEXT_NODE && n.textContent?.trim(),
+          );
+          if (hasText && !getComputedStyle(el).fontFamily.includes('Inter')) {
+            bad.push(el.tagName + '.' + el.className + ': ' + el.textContent?.trim().slice(0, 30));
+          }
+        }
+      }
+      return bad;
+    });
+    expect(offenders, url).toEqual([]);
+  }
 });
 
 test('window is restorable from a link', async ({ page }) => {

@@ -1,7 +1,8 @@
 import { useCallback, useState, type ReactNode } from 'react';
 import Window from './Window';
 import PixelIcon from '../icons/PixelIcon';
-import Taskbar, { type StartItem } from './Taskbar';
+import Taskbar, { PLAYER_START_ITEM, type StartItem } from './Taskbar';
+import { openPlayer } from '../../lib/player';
 import { useWindowManager, type WinSpec } from './useWindowManager';
 import { SECTIONS, SITE } from '../../lib/site';
 import type { PostSummary } from '../../lib/posts';
@@ -15,14 +16,22 @@ interface Props {
 const EXTRA_ICONS = [
   { id: 'contact', label: 'Contact', icon: 'contact' },
   { id: 'about', label: 'About', icon: 'about' },
+  { id: 'player', label: 'Grail Player', icon: 'player' },
 ] as const;
+
+/** Desktop icons that aren't windows of their own. */
+const LAUNCHERS: Record<string, () => void> = { player: openPlayer };
 
 const ICONS = [...SECTIONS.map(({ id, label, icon }) => ({ id, label, icon })), ...EXTRA_ICONS];
 
 const START_ITEMS: StartItem[] = [
-  ...ICONS.map(({ id, label, icon }) => ({ label, icon, windowId: id })),
+  ...ICONS.filter(({ id }) => !LAUNCHERS[id]).map(({ id, label, icon }) => ({
+    label,
+    icon,
+    windowId: id,
+  })),
+  PLAYER_START_ITEM,
   { label: 'Trend roundup mockup', icon: 'mockup', href: '/mockups/trend-roundup' },
-  { label: 'Media player mockup', icon: 'player', href: '/mockups/media-player' },
   { label: 'Mobile mockup', icon: 'mockup', href: '/mockups/mobile' },
 ];
 
@@ -102,6 +111,7 @@ export default function Desktop({ posts, children }: Props) {
   }, []);
 
   const wm = useWindowManager(resolve);
+  const launch = (id: string) => (LAUNCHERS[id] ? LAUNCHERS[id]() : wm.open(id));
 
   const renderBody = (id: string) => {
     if (id === 'contact') return <ContactBody />;
@@ -124,13 +134,13 @@ export default function Desktop({ posts, children }: Props) {
               onClick={(e) => {
                 setSelected(icon.id);
                 // Single tap opens on touch; mouse uses double-click like the real thing.
-                if ((e.nativeEvent as PointerEvent).pointerType === 'touch') wm.open(icon.id);
+                if ((e.nativeEvent as PointerEvent).pointerType === 'touch') launch(icon.id);
               }}
-              onDoubleClick={() => wm.open(icon.id)}
+              onDoubleClick={() => launch(icon.id)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
-                  wm.open(icon.id);
+                  launch(icon.id);
                 }
               }}
             >

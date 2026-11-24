@@ -3,8 +3,11 @@ import '@fontsource/vt323';
 import '@fontsource-variable/inter';
 import '../styles/global.css';
 import '../styles/desktop.css';
+import '../styles/player.css';
 import { ClientRouter } from 'astro:transitions';
 import { SITE, organizationJsonLd } from '../lib/site';
+import GrailPlayer from '../components/player/GrailPlayer';
+import { TRACKS } from '../lib/tracks';
 
 interface Props {
   title?: string;
@@ -42,5 +45,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   </head>
   <body>
     <slot />
+    {/* Persists across page changes so music keeps playing (D19). */}
+    <GrailPlayer client:idle transition:persist="ig-player" tracks={TRACKS} />
   </body>
 </html>
