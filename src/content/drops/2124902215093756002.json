@@ -1,1 +1,22 @@
-{"url":"https://x.com/i/status/2124902215093756002","addedAt":"2026-11-24T12:00:00-05:00"}
+{
+  "url": "https://x.com/i/status/2124902215093756002",
+  "addedAt": "2026-11-24T12:00:00-05:00",
+  "post": {
+    "text": "",
+    "createdAt": "2026-11-23T16:25:41.000Z",
+    "author": {
+      "name": "internet grails",
+      "handle": "@internetgrails",
+      "avatar": "https://pbs.twimg.com/profile_images/2123529721937838081/tJOn95HI_bigger.jpg"
+    },
+    "likes": 70,
+    "media": [
+      {
+        "type": "photo",
+        "url": "https://pbs.twimg.com/media/HX0rTUCWMAAB9ua.jpg",
+        "w": 1200,
+        "h": 1072
+      }
+    ]
+  }
+}
